@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.info.License;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -19,10 +18,10 @@ public class OpenApiConfig {
 
     private Info apiInfo() {
         return new Info()
-                .title("Usuarios Wealth Tech Web API")
-                .description("Web API de usuarios del sistema Wealth Tech")
-                .contact(new Contact().email("contacto@meltsan.com").name("Infosel Team"))
-                .license(new License().name("Infosel 2021").url("https://www.infosel.com"))
+                .title("Fundici\u00F3n Lara API")
+                .description("Web API de Fundici\u00F3n Lara")
+                .contact(new Contact().email("roberto.aav.23@gmail.com").name("GDB"))
+                // .license(new License().name("Lara 2025").url(""))
                 .version("0.0.1");
     }
 

@@ -1,6 +1,7 @@
 package com.fundicion.lara.service;
 
 import com.fundicion.lara.dto.ProductDto;
+import com.fundicion.lara.dto.request.RequestParams;
 import com.fundicion.lara.entity.ProductEntity;
 import com.fundicion.lara.exception.NotFoundException;
 import com.fundicion.lara.repository.ProductRepository;
@@ -8,6 +9,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,12 +23,18 @@ public class ProductService {
     private ProductRepository productRepository;
     private ModelMapper modelMapper;
 
-    public List<ProductDto> findAllProducts() {
-        val products = this.productRepository.findAll();
-        if (products.isEmpty()) {
+    public List<ProductDto> findAllProducts(RequestParams requestParams) {
+        var pagination = requestParams.getPagination();
+        var sort = Sort.by(Sort.Direction.fromString(requestParams.getOrder()), requestParams.getOrderBy());
+        var pageable = PageRequest.of(pagination.getNumberPage(), pagination.getPageSize(), sort);
+
+        val response = this.productRepository.findAll(pageable);
+        if (response.isEmpty()) {
             throw new NotFoundException("Parece que no tenemos ningún producto en este momento.");
         }
-        return products.stream()
+        pagination.setTotalElements(response.getTotalElements());
+
+        return response.getContent().stream()
                 .map(entity -> this.modelMapper.map(entity, ProductDto.class))
                 .collect(Collectors.toList());
     }
@@ -52,13 +61,13 @@ public class ProductService {
         return this.modelMapper.map(this.productRepository.save(product), ProductDto.class);
     }
 
-    public String deleteProduct(Integer productId) {
+    public String deleteProductById(Integer productId) {
         val product = findProductEntityById(productId);
         this.productRepository.delete(product);
         return "OK";
     }
 
-    private ProductEntity findProductEntityById(Integer id) {
+    public ProductEntity findProductEntityById(Integer id) {
         val productEntity = this.productRepository.findById(id);
         val message = String.format("No se pudo encontrar el producto con el ID: %s", id);
         if (productEntity.isEmpty()) {

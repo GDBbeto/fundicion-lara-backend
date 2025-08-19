@@ -2,15 +2,18 @@ package com.fundicion.lara.controller;
 
 
 import com.fundicion.lara.commons.data.ApiResponse;
-import com.fundicion.lara.commons.data.PaginationParams;
+import com.fundicion.lara.commons.data.Pagination;
 import com.fundicion.lara.dto.ProductDto;
+import com.fundicion.lara.dto.request.RequestParams;
 import com.fundicion.lara.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Tag(name = "PRODUCTS")
@@ -27,10 +30,28 @@ public class ProductController {
             description = "Gets the products by parameters",
             summary = "Gets the products by parameters"
     )
-    public List<ProductDto> findAllProducts(
-            @ModelAttribute PaginationParams params
+    public ApiResponse<List<ProductDto>> findAllProducts(
+            @Parameter(name = "page", description = "Número de página")
+            @RequestParam(defaultValue = "1") int page,
+            @Parameter(name = "pageSize", description = "Tamaño de página")
+            @RequestParam(defaultValue = "10") int pageSize,
+            @Parameter(name = "order", description = "asc | desc")
+            @RequestParam(defaultValue = "asc", required = false) String order,
+            @Parameter(name = "orderBy", description = "campo para el ordenamiento")
+            @RequestParam(defaultValue = "productId", required = false) String orderBy
     ) {
-        return this.productService.findAllProducts();
+        Pagination pagination = Pagination.builder()
+                .page(page)
+                .pageSize(pageSize)
+                .build();
+
+        RequestParams requestParams = RequestParams.builder()
+                .order(order)
+                .orderBy(orderBy)
+                .pagination(pagination)
+                .build();
+
+        return ApiResponse.ok(this.productService.findAllProducts(requestParams), pagination);
     }
 
     @GetMapping("/{productId}")
@@ -83,7 +104,7 @@ public class ProductController {
             @Parameter(name = "productId", description = "Product key")
             @PathVariable Integer productId
     ) {
-        return ApiResponse.ok(this.productService.deleteProduct(productId));
+        return ApiResponse.ok(this.productService.deleteProductById(productId));
     }
 
 }

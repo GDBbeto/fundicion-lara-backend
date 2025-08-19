@@ -1,12 +1,16 @@
 package com.fundicion.lara.config;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fundicion.lara.commons.data.CommonErrorResponse;
 import com.fundicion.lara.exception.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
+
+import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -60,9 +64,21 @@ public class ControllerHandler {
 
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<CommonErrorResponse> handleAllExceptions(Exception ex, WebRequest request) {
+    public ResponseEntity<CommonErrorResponse> handleAllExceptions(Exception ex) {
         CommonErrorResponse error = CommonErrorResponse.builder()
                 .message(ex.getMessage()).build();
         return new ResponseEntity<>(error, INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(INTERNAL_SERVER_ERROR)
+    public ResponseEntity<CommonErrorResponse> handleInvalidFormatException(MethodArgumentNotValidException e) {
+        String errorMessage = e.getBindingResult().getFieldErrors().stream()
+                .map(fieldError -> fieldError.getField() + " " + fieldError.getDefaultMessage())
+                .collect(Collectors.joining(";"));
+
+        CommonErrorResponse error = CommonErrorResponse.builder()
+                .message(errorMessage).build();
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 }

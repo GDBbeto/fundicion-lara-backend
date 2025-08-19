@@ -17,7 +17,7 @@ public class Interceptor implements HandlerInterceptor {
     private static final List<String> EXCLUDED_PATHS = List.of("favicon", "swagger", "api-docs");
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         if (isExcludedPath(request.getRequestURI())) return true;
         if ("OPTIONS".equals(request.getMethod())) return true;
         return true;
