@@ -30,6 +30,7 @@ public class OrderTransactionService {
     private ProductService productService;
     private ProductRepository productRepository;
     private ModelMapper modelMapper;
+    private TransactionService transactionService;
 
     public List<OrderTransactionDto> findAllPaymentTransactions(RequestParams requestParams) {
         var pagination = requestParams.getPagination();
@@ -76,6 +77,10 @@ public class OrderTransactionService {
         }
 
         orderTransactionEntity = this.transactionRepository.save(orderTransactionEntity);
+
+        if (orderTransactionDto.getAddTransaction()) {
+            this.transactionService.saveTransactionByOrderTransaction(orderTransactionEntity);
+        }
         return this.mapEntityToDto(orderTransactionEntity);
     }
 
@@ -84,7 +89,8 @@ public class OrderTransactionService {
         var orderTransactionEntityCopy = modelMapper.map(orderTransactionEntity, OrderTransactionEntity.class);
 
         if (isStatusCancelled(orderTransactionDto, orderTransactionEntityCopy)) {
-            orderTransactionEntity.setPaymentStatus(orderTransactionDto.getPaymentStatus());
+            orderTransactionEntity.setDeliveryStatus(orderTransactionDto.getDeliveryStatus());
+            this.transactionService.updateTransactionByOrderTransaction(orderTransactionEntity, "I");
             this.transactionRepository.save(orderTransactionEntity);
             return this.mapEntityToDto(orderTransactionEntity);
         }
@@ -93,7 +99,7 @@ public class OrderTransactionService {
 
         boolean productChanged = !orderTransactionDto.getProductId().equals(orderTransactionEntity.getProduct().getProductId());
 
-        if(productChanged){
+        if (productChanged) {
             orderTransactionEntity.setSellingPrice(orderTransactionEntity.getProduct().getSellingPrice());
             orderTransactionEntity.setPurchasePrice(orderTransactionEntity.getProduct().getPurchasePrice());
         }
@@ -114,6 +120,8 @@ public class OrderTransactionService {
         orderTransactionEntity.setDeliveryStatus(orderTransactionDto.getDeliveryStatus());
         orderTransactionEntity.setOperationDate(orderTransactionDto.getOperationDate());
 
+        this.transactionService.updateTransactionByOrderTransaction(orderTransactionEntity, "A");
+
         this.transactionRepository.save(orderTransactionEntity);
 
         return this.mapEntityToDto(orderTransactionEntity);
@@ -129,6 +137,9 @@ public class OrderTransactionService {
             val currentProduct = paymentTransaction.getProduct();
             updateStock(currentProduct, paymentTransaction.getItemCount(), true);
         }
+
+        this.transactionService.deleteTransactionByByOrderTransactionId(id);
+
         this.transactionRepository.delete(paymentTransaction);
         return "OK";
     }
@@ -216,7 +227,7 @@ public class OrderTransactionService {
         return productEntity.get();
     }
 
-    private void processPayment(OrderTransactionEntity orderTransactionEntity, BigDecimal total){
+    private void processPayment(OrderTransactionEntity orderTransactionEntity, BigDecimal total) {
         val amountTotal = orderTransactionEntity.getExtraAmount().add(orderTransactionEntity.getAmountPaid());
 
         if (amountTotal.compareTo(total) >= 0) {

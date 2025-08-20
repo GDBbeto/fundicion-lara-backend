@@ -36,7 +36,7 @@ public class OrderTransactionController {
             @Parameter(name = "order", description = "asc | desc")
             @RequestParam(defaultValue = "asc", required = false) String order,
             @Parameter(name = "orderBy", description = "campo para el ordenamiento")
-            @RequestParam(defaultValue = "orderTransactionId", required = false) String orderBy,
+            @RequestParam(defaultValue = "transactionId", required = false) String orderBy,
             @Parameter(name = "startDate", description = "Fecha inicio")
             @RequestParam(value = "startDate")
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,

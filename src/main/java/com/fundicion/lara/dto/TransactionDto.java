@@ -1,6 +1,7 @@
 package com.fundicion.lara.dto;
 
 
+import com.fundicion.lara.commons.emuns.TransactionType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,13 +19,17 @@ import java.time.LocalDate;
 public class TransactionDto {
     private Long transactionId;
 
+    private Integer orderTransactionId;
+
     private BigDecimal amount;
 
     private String description;
 
     private String invoiceNumber;
 
-    private String type; // VENTA | COMPRA | GASTOS
+    private TransactionType type; // VENTA | COMPRA | GASTOS
+
+    private String status = "A"; // ACTIVO - INACTIVO
 
     private LocalDate operationDate;
 }

@@ -1,6 +1,7 @@
 package com.fundicion.lara.entity;
 
 
+import com.fundicion.lara.commons.emuns.TransactionType;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -23,17 +24,23 @@ public class TransactionEntity extends AuditCommonEntity {
     @Column(name = "transaction_id")
     private Long transactionId;
 
+    @Column(name = "order_transaction_id")
+    private Integer orderTransactionId;
+
     @Column(name = "amount", nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
 
     @Column(name = "description", length = 200)
     private String description;
 
-    @Column(name = "invoice_number", nullable = false, length = 100)
+    @Column(name = "invoice_number")
     private String invoiceNumber;
 
     @Column(name = "type", nullable = false, length = 50)
-    private String type; // VENTA | COMPRA | GASTOS
+    private TransactionType type; // VENTA | COMPRA | GASTOS
+
+    @Column(name = "status")
+    private String status = "A"; // ACTIVO - INACTIVO
 
     @Column(name = "operation_date", nullable = false)
     private LocalDate operationDate;

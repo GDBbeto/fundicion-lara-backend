@@ -1,8 +1,9 @@
 package com.fundicion.lara.service;
 
-import com.fundicion.lara.commons.emuns.DeliveryStatus;
+import com.fundicion.lara.commons.emuns.TransactionType;
 import com.fundicion.lara.dto.TransactionDto;
 import com.fundicion.lara.dto.request.RequestParams;
+import com.fundicion.lara.entity.OrderTransactionEntity;
 import com.fundicion.lara.entity.TransactionEntity;
 import com.fundicion.lara.exception.NotFoundException;
 import com.fundicion.lara.repository.TransactionRepository;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,6 +54,22 @@ public class TransactionService {
         return this.modelMapper.map(transactionEntity, TransactionDto.class);
     }
 
+    public void saveTransactionByOrderTransaction(OrderTransactionEntity orderTransactionEntity) {
+        var total = orderTransactionEntity.getSellingPrice().multiply(BigDecimal.valueOf(orderTransactionEntity.getItemCount()));
+        var amount = orderTransactionEntity.getExtraAmount().add(total);
+
+        TransactionEntity transactionEntity = TransactionEntity.builder()
+                .amount(amount)
+                .orderTransactionId(orderTransactionEntity.getOrderTransactionId())
+                .description(orderTransactionEntity.getDescription())
+                .invoiceNumber(orderTransactionEntity.getInvoiceNumber())
+                .type(TransactionType.SALE)
+                .operationDate(orderTransactionEntity.getOperationDate())
+                .build();
+
+        this.transactionRepository.save(transactionEntity);
+    }
+
     public TransactionDto updateTransactionById(TransactionDto transactionDto, Long transactionId) {
         var transactionEntity = this.findEntityById(transactionId);
         transactionEntity.setType(transactionDto.getType());
@@ -62,10 +80,31 @@ public class TransactionService {
         return this.modelMapper.map(transactionRepository.save(transactionEntity), TransactionDto.class);
     }
 
+    public void updateTransactionByOrderTransaction(OrderTransactionEntity orderTransactionEntity, String status) {
+        var transaction = this.transactionRepository.findByOrderTransactionId(orderTransactionEntity.getOrderTransactionId());
+        if (transaction.isPresent()) {
+            var total = orderTransactionEntity.getSellingPrice().multiply(BigDecimal.valueOf(orderTransactionEntity.getItemCount()));
+            var amount = orderTransactionEntity.getExtraAmount().add(total);
+
+            var transactionEntity = transaction.get();
+            transactionEntity.setAmount(amount);
+            transactionEntity.setDescription(orderTransactionEntity.getDescription());
+            transactionEntity.setInvoiceNumber(orderTransactionEntity.getInvoiceNumber());
+            transactionEntity.setOperationDate(orderTransactionEntity.getOperationDate());
+            transactionEntity.setStatus(status);
+            this.transactionRepository.save(transactionEntity);
+        }
+    }
+
     public String deleteTransactionById(Long id) {
         val paymentTransaction = this.findEntityById(id);
         this.transactionRepository.delete(paymentTransaction);
         return "OK";
+    }
+
+    public void deleteTransactionByByOrderTransactionId(Integer orderTransactionId) {
+        var transaction = this.transactionRepository.findByOrderTransactionId(orderTransactionId);
+        transaction.ifPresent(transactionEntity -> this.transactionRepository.delete(transactionEntity));
     }
 
 
