@@ -25,7 +25,7 @@ import java.util.List;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class PaymentTransactionService {
+public class OrderTransactionService {
     private OrderTransactionRepository transactionRepository;
     private ProductService productService;
     private ProductRepository productRepository;
@@ -70,7 +70,7 @@ public class PaymentTransactionService {
         BigDecimal total = product.getSellingPrice().multiply(BigDecimal.valueOf(orderTransactionDto.getItemCount()));
         this.processPayment(orderTransactionEntity, total);
         orderTransactionEntity.setSellingPrice(product.getSellingPrice());
-
+        orderTransactionEntity.setPurchasePrice(product.getPurchasePrice());
         if (orderTransactionDto.getDeliveryStatus() == null) {
             orderTransactionEntity.setDeliveryStatus(DeliveryStatus.PENDING);
         }
@@ -90,6 +90,13 @@ public class PaymentTransactionService {
         }
 
         validateProduct(orderTransactionDto, orderTransactionEntityCopy);
+
+        boolean productChanged = !orderTransactionDto.getProductId().equals(orderTransactionEntity.getProduct().getProductId());
+
+        if(productChanged){
+            orderTransactionEntity.setSellingPrice(orderTransactionEntity.getProduct().getSellingPrice());
+            orderTransactionEntity.setPurchasePrice(orderTransactionEntity.getProduct().getPurchasePrice());
+        }
 
         // var product = productService.findProductEntityById(orderTransactionDto.getProductId());
         orderTransactionEntity.setProduct(orderTransactionEntity.getProduct());

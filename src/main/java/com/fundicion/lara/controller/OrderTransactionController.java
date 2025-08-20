@@ -4,7 +4,7 @@ import com.fundicion.lara.commons.data.ApiResponse;
 import com.fundicion.lara.commons.data.Pagination;
 import com.fundicion.lara.dto.OrderTransactionDto;
 import com.fundicion.lara.dto.request.RequestParams;
-import com.fundicion.lara.service.PaymentTransactionService;
+import com.fundicion.lara.service.OrderTransactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,7 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 @RequestMapping(value = "v1/management/order/transaction")
 public class OrderTransactionController {
-    private PaymentTransactionService paymentTransactionService;
+    private OrderTransactionService orderTransactionService;
 
     @GetMapping
     @Operation(
@@ -38,10 +38,10 @@ public class OrderTransactionController {
             @Parameter(name = "orderBy", description = "campo para el ordenamiento")
             @RequestParam(defaultValue = "orderTransactionId", required = false) String orderBy,
             @Parameter(name = "startDate", description = "Fecha inicio")
-            @RequestParam(value = "startDate", required = true)
+            @RequestParam(value = "startDate")
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @Parameter(name = "endDate", description = "Fecha fin")
-            @RequestParam(value = "endDate", required = true)
+            @RequestParam(value = "endDate")
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
             ) {
         Pagination pagination = Pagination.builder()
@@ -57,7 +57,7 @@ public class OrderTransactionController {
                 .pagination(pagination)
                 .build();
 
-        return ApiResponse.ok(this.paymentTransactionService.findAllPaymentTransactions(requestParams), pagination);
+        return ApiResponse.ok(this.orderTransactionService.findAllPaymentTransactions(requestParams), pagination);
     }
 
     @GetMapping("/{orderTransactionId}")
@@ -70,7 +70,7 @@ public class OrderTransactionController {
             @Parameter(name = "orderTransactionId", description = "Order transaction key")
             @PathVariable Integer orderTransactionId
     ) {
-        return ApiResponse.ok(this.paymentTransactionService.findPaymentTransactionById(orderTransactionId));
+        return ApiResponse.ok(this.orderTransactionService.findPaymentTransactionById(orderTransactionId));
     }
 
     @PostMapping
@@ -82,7 +82,7 @@ public class OrderTransactionController {
     public ApiResponse<OrderTransactionDto> savePaymentTransaction(
             @RequestBody OrderTransactionDto orderTransactionDto
     ) {
-        return ApiResponse.ok(this.paymentTransactionService.savePaymentTransaction(orderTransactionDto));
+        return ApiResponse.ok(this.orderTransactionService.savePaymentTransaction(orderTransactionDto));
     }
 
     @PutMapping("/{orderTransactionId}")
@@ -96,7 +96,7 @@ public class OrderTransactionController {
             @Parameter(name = "orderTransactionId", description = "Order transaction key")
             @PathVariable Integer orderTransactionId
     ) {
-        return ApiResponse.ok(this.paymentTransactionService.updatePaymentTransaction(orderTransactionDto,  orderTransactionId));
+        return ApiResponse.ok(this.orderTransactionService.updatePaymentTransaction(orderTransactionDto,  orderTransactionId));
     }
 
     @DeleteMapping("/{orderTransactionId}")
@@ -109,7 +109,7 @@ public class OrderTransactionController {
             @Parameter(name = "orderTransactionId", description = "Order transaction key")
             @PathVariable Integer orderTransactionId
     ) {
-        return ApiResponse.ok(this.paymentTransactionService.deleteTransactionById(orderTransactionId));
+        return ApiResponse.ok(this.orderTransactionService.deleteTransactionById(orderTransactionId));
     }
 
 

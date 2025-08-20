@@ -61,6 +61,9 @@ public class OrderTransactionEntity extends AuditCommonEntity {
     @Column(name = "delivery_status", nullable = false, length = 10)
     private DeliveryStatus deliveryStatus;
 
+    @Column(name = "purchase_price", nullable = false, precision = 10, scale = 2)
+    private BigDecimal purchasePrice;
+
     @Column(name = "selling_price", nullable = false, precision = 10, scale = 2)
     private BigDecimal sellingPrice;
 

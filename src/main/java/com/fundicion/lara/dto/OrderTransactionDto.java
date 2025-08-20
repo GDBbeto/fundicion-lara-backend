@@ -30,5 +30,14 @@ public class OrderTransactionDto implements Serializable {
     private BigDecimal amountPaid;
     private PaymentStatus paymentStatus;
     private DeliveryStatus deliveryStatus;
+    private BigDecimal purchasePrice;
+    private BigDecimal sellingPrice;
+    private BigDecimal profit;
     private LocalDate operationDate;
+
+    public BigDecimal getProfit() {
+        BigDecimal totalPurchase =purchasePrice.multiply(BigDecimal.valueOf(itemCount));
+        BigDecimal totalSelling = sellingPrice.multiply(BigDecimal.valueOf(itemCount));
+        return totalSelling.subtract(totalPurchase);
+    }
 }
