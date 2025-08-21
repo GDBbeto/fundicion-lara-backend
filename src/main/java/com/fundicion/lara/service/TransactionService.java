@@ -2,6 +2,7 @@ package com.fundicion.lara.service;
 
 import com.fundicion.lara.commons.emuns.TransactionType;
 import com.fundicion.lara.dto.TransactionDto;
+import com.fundicion.lara.dto.TransactionSummaryDto;
 import com.fundicion.lara.dto.request.RequestParams;
 import com.fundicion.lara.entity.OrderTransactionEntity;
 import com.fundicion.lara.entity.TransactionEntity;
@@ -46,6 +47,27 @@ public class TransactionService {
 
     public TransactionDto findTransactionById(Long productId) {
         return modelMapper.map(findEntityById(productId), TransactionDto.class);
+    }
+
+    public TransactionSummaryDto findTransactionSummary(RequestParams requestParams) {
+        var totalSales = this.transactionRepository.getTotalByTypeAndDateRange(
+                TransactionType.SALE,
+                requestParams.getStartDate(),
+                requestParams.getEndDate()
+        );
+
+        var totalPurchases = this.transactionRepository.getTotalByTypeAndDateRange(
+                TransactionType.PURCHASE,
+                requestParams.getStartDate(),
+                requestParams.getEndDate()
+        );
+
+        return TransactionSummaryDto.builder()
+                .totalSales(totalSales)
+                .totalPurchases(totalPurchases)
+                .difference(totalSales.subtract(totalPurchases))
+                .build();
+
     }
 
     public TransactionDto saveTransaction(TransactionDto transactionDto) {

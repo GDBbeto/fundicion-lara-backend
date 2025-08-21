@@ -25,17 +25,21 @@ public class ProductController {
     @GetMapping
     @Operation(
             operationId = "findAllProducts",
-            description = "Gets the products by parameters",
-            summary = "Gets the products by parameters"
+            summary = "Retrieve a paginated list of products based on specified filters",
+            description = "This endpoint retrieves a list of products from the system, allowing for pagination and sorting based on specified parameters. " +
+                    "You can specify the page number and the number of products per page for efficient data retrieval. " +
+                    "The results can be sorted in ascending or descending order based on a specified field, such as product ID or any other relevant attribute. " +
+                    "If no sorting field is provided, the default sorting will be applied. " +
+                    "This endpoint is useful for displaying products in a user-friendly manner, especially in applications with large inventories."
     )
     public ApiResponse<List<ProductDto>> findAllProducts(
-            @Parameter(name = "page", description = "Número de página")
+            @Parameter(name = "page", description = "The page number to retrieve, starting from 1.")
             @RequestParam(defaultValue = "1") int page,
-            @Parameter(name = "pageSize", description = "Tamaño de página")
+            @Parameter(name = "pageSize", description = "The number of products to return per page.")
             @RequestParam(defaultValue = "10") int pageSize,
-            @Parameter(name = "order", description = "asc | desc")
+            @Parameter(name = "order", description = "Sorting order: 'asc' for ascending or 'desc' for descending.")
             @RequestParam(defaultValue = "asc", required = false) String order,
-            @Parameter(name = "orderBy", description = "campo para el ordenamiento")
+            @Parameter(name = "orderBy", description = "The field by which to sort the products.")
             @RequestParam(defaultValue = "productId", required = false) String orderBy
     ) {
         Pagination pagination = Pagination.builder()
@@ -55,11 +59,14 @@ public class ProductController {
     @GetMapping("/{productId}")
     @Operation(
             operationId = "findProductById",
-            description = "Gets the products by ID",
-            summary = "Gets the products by ID"
+            summary = "Retrieve a product by its unique identifier",
+            description = "This endpoint retrieves the details of a specific product identified by its unique product ID. " +
+                    "The product ID must correspond to an existing product in the system. " +
+                    "The response will include all relevant information about the product, such as name, description, price, and stock status. " +
+                    "If the specified product ID does not exist, an appropriate error response will be returned, indicating that the product was not found."
     )
     public ApiResponse<ProductDto> findProductById(
-            @Parameter(name = "productId", description = "Product key")
+            @Parameter(name = "productId", description = "The unique identifier of the product")
             @PathVariable Integer productId
     ) {
         return ApiResponse.ok(this.productService.findProductById(productId));
@@ -68,8 +75,11 @@ public class ProductController {
     @PostMapping
     @Operation(
             operationId = "saveProduct",
-            description = "Save a new product in the system.",
-            summary = "Save a new product in the system."
+            summary = "Create a new product in the system",
+            description = "This endpoint allows for the creation of a new product in the system. " +
+                    "The request must include a ProductDto object containing all necessary details, such as name, description, price, and stock quantity. " +
+                    "Upon successful creation, the system will return the complete details of the newly created product, including its unique identifier. " +
+                    "If any required fields are missing or invalid, an error response will be returned, indicating the specific validation issues."
     )
     public ApiResponse<ProductDto> saveProduct(
             @RequestBody ProductDto productDto
@@ -81,12 +91,16 @@ public class ProductController {
     @PutMapping("/{productId}")
     @Operation(
             operationId = "updateProduct",
-            description = "Update  product in the system..",
-            summary = "Update  product in the system."
+            summary = "Update an existing product in the system",
+            description = "This endpoint allows for the modification of an existing product identified by its unique product ID. " +
+                    "The request must include a ProductDto object containing the updated details, such as name, description, price, and stock quantity. " +
+                    "Only the fields provided in the request will be updated, while other fields will remain unchanged. " +
+                    "If the specified product ID does not correspond to an existing product, an error response will be returned, indicating that the product was not found. " +
+                    "Additionally, if any required fields are missing or invalid, a validation error will be returned."
     )
     public ApiResponse<ProductDto> updateProduct(
             @RequestBody ProductDto productDto,
-            @Parameter(name = "productId", description = "Product key")
+            @Parameter(name = "productId", description = "The unique identifier of the product")
             @PathVariable Integer productId
     ) {
         return ApiResponse.ok(this.productService.updateProduct(productDto, productId));
@@ -95,11 +109,11 @@ public class ProductController {
     @DeleteMapping("/{productId}")
     @Operation(
             operationId = "deleteProduct",
-            description = "Delete product in the system..",
-            summary = "Delete product in the system."
+            description = "Removes a product from the system using its unique identifier.",
+            summary = "Product deletion."
     )
     public ApiResponse<String> deleteProduct(
-            @Parameter(name = "productId", description = "Product key")
+            @Parameter(name = "productId", description = "The unique identifier of the product")
             @PathVariable Integer productId
     ) {
         return ApiResponse.ok(this.productService.deleteProductById(productId));
