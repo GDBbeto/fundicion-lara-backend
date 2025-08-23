@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -62,6 +63,13 @@ public class TransactionService {
                 requestParams.getEndDate()
         );
 
+        if (totalSales == null) {
+            totalSales = BigDecimal.ZERO;
+        }
+        if (totalPurchases == null) {
+            totalPurchases = BigDecimal.ZERO;
+        }
+
         return TransactionSummaryDto.builder()
                 .totalSales(totalSales)
                 .totalPurchases(totalPurchases)
@@ -76,6 +84,7 @@ public class TransactionService {
         return this.modelMapper.map(transactionEntity, TransactionDto.class);
     }
 
+    @Transactional
     public void saveTransactionByOrderTransaction(OrderTransactionEntity orderTransactionEntity) {
         var total = orderTransactionEntity.getSellingPrice().multiply(BigDecimal.valueOf(orderTransactionEntity.getItemCount()));
         var amount = orderTransactionEntity.getExtraAmount().add(total);
@@ -86,6 +95,7 @@ public class TransactionService {
                 .description(orderTransactionEntity.getDescription())
                 .invoiceNumber(orderTransactionEntity.getInvoiceNumber())
                 .type(TransactionType.SALE)
+                .status("A")
                 .operationDate(orderTransactionEntity.getOperationDate())
                 .build();
 
@@ -99,9 +109,11 @@ public class TransactionService {
         transactionEntity.setDescription(transactionDto.getDescription());
         transactionEntity.setInvoiceNumber(transactionDto.getInvoiceNumber());
         transactionEntity.setOperationDate(transactionDto.getOperationDate());
+        transactionEntity.setIssuerRfc(transactionDto.getIssuerRfc());
         return this.modelMapper.map(transactionRepository.save(transactionEntity), TransactionDto.class);
     }
 
+    @Transactional
     public void updateTransactionByOrderTransaction(OrderTransactionEntity orderTransactionEntity, String status) {
         var transaction = this.transactionRepository.findByOrderTransactionId(orderTransactionEntity.getOrderTransactionId());
         if (transaction.isPresent()) {

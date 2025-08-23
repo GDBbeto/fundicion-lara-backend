@@ -36,6 +36,9 @@ public class TransactionEntity extends AuditCommonEntity {
     @Column(name = "invoice_number")
     private String invoiceNumber;
 
+    @Column(name = "issuer_rfc")
+    private String issuerRfc;
+
     @Column(name = "type", nullable = false, length = 50)
     private TransactionType type; // VENTA | COMPRA | GASTOS
 

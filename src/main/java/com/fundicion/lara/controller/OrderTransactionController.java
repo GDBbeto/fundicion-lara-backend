@@ -18,7 +18,7 @@ import java.util.List;
 @Tag(name = "ORDER-TRANSACTION")
 @RestController
 @AllArgsConstructor
-@RequestMapping(value = "v1/management/order/transaction")
+@RequestMapping(value = "v1/management/orders/transactions")
 public class OrderTransactionController {
     private OrderTransactionService orderTransactionService;
 

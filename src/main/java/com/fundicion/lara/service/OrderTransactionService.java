@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -56,6 +57,7 @@ public class OrderTransactionService {
         return this.mapEntityToDto(this.findPaymentTransactionEntityEntityById(orderTransactionId));
     }
 
+    @Transactional
     public OrderTransactionDto savePaymentTransaction(OrderTransactionDto orderTransactionDto) {
         var orderTransactionEntity = this.mapDtoToEntity(orderTransactionDto);
 
@@ -84,6 +86,7 @@ public class OrderTransactionService {
         return this.mapEntityToDto(orderTransactionEntity);
     }
 
+    @Transactional
     public OrderTransactionDto updatePaymentTransaction(OrderTransactionDto orderTransactionDto, Integer orderTransactionId) {
         var orderTransactionEntity = this.findPaymentTransactionEntityEntityById(orderTransactionId);
         var orderTransactionEntityCopy = modelMapper.map(orderTransactionEntity, OrderTransactionEntity.class);
@@ -128,6 +131,7 @@ public class OrderTransactionService {
     }
 
 
+    @Transactional
     public String deleteTransactionById(Integer id) {
         val paymentTransaction = this.findPaymentTransactionEntityEntityById(id);
         val statusCompleted = DeliveryStatus.CANCELLED.getStatus().equals(paymentTransaction.getDeliveryStatus().getStatus()) ||

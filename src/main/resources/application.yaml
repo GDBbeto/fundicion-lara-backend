@@ -2,16 +2,13 @@ spring:
   application:
     name: "fundicion-lara"
     version: "1.0.1"
-  h2:
-    console:
-      enabled: true
-    datasource:
-      url: jdbc:h2:mem:testdb
-      driver-class-name: org.h2.Driver
-      username: sa
-      password:
-    jpa:
-      database-platform: org.hibernate.dialect.H2Dialect
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: "${PORTFOLIO_REAL_SERVICE_DATASOURCE_URL:jdbc:mysql://localhost:3306/fundicion_lara_db}"
+    username: "${DATASOURCE_USERNAME:root}"
+    password: "${DATASOURCE_PASSWORD:root}"
+    hikari:
+      maximum-pool-size: "${MAXIMUM_POOL_SIZE:10}"
 
 springdoc:
   api-docs:

@@ -27,9 +27,11 @@ public class TransactionDto {
 
     private String invoiceNumber;
 
-    private TransactionType type; // VENTA | COMPRA | GASTOS
+    private String issuerRfc;
 
-    private String status = "A"; // ACTIVO - INACTIVO
+    private TransactionType type;
+
+    private String status = "A";
 
     private LocalDate operationDate;
 }

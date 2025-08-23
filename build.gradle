@@ -32,6 +32,10 @@ dependencies {
 
 	implementation("org.springdoc:springdoc-openapi-ui:1.6.3")
 
+	implementation 'org.apache.pdfbox:pdfbox:2.0.29'
+
+	runtimeOnly("mysql:mysql-connector-java")
+
 }
 
 tasks.named('test') {

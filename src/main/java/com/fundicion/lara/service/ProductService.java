@@ -3,6 +3,8 @@ package com.fundicion.lara.service;
 import com.fundicion.lara.dto.ProductDto;
 import com.fundicion.lara.dto.request.RequestParams;
 import com.fundicion.lara.entity.ProductEntity;
+import com.fundicion.lara.exception.BadRequestException;
+import com.fundicion.lara.exception.ConflictException;
 import com.fundicion.lara.exception.NotFoundException;
 import com.fundicion.lara.repository.ProductRepository;
 import lombok.AllArgsConstructor;
@@ -44,6 +46,10 @@ public class ProductService {
     }
 
     public ProductDto saveProduct(ProductDto productDto) {
+        var productByName = this.productRepository.findProductEntitiesByName(productDto.getName());
+        if (productByName.isPresent()) {
+            throw new ConflictException("El producto ya existe");
+        }
         var productEntity = this.modelMapper.map(productDto, ProductEntity.class);
         productEntity = this.productRepository.save(productEntity);
         return this.modelMapper.map(productEntity, ProductDto.class);

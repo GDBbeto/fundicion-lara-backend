@@ -19,7 +19,7 @@ import java.util.List;
 @Tag(name = "TRANSACTION")
 @RestController
 @AllArgsConstructor
-@RequestMapping(value = "v1/management/transaction")
+@RequestMapping(value = "v1/management/transactions")
 public class TransactionController {
     private TransactionService transactionService;
 
