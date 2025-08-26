@@ -35,6 +35,7 @@ dependencies {
 	implementation 'org.apache.pdfbox:pdfbox:2.0.29'
 
 	runtimeOnly("mysql:mysql-connector-java")
+	implementation 'com.fasterxml.jackson.core:jackson-databind'
 
 }
 

@@ -1,6 +1,8 @@
 package com.fundicion.lara.commons.constants;
 
 public class Constants {
+    public static final String IMGBB_API_URL = "https://api.imgbb.com/1/upload";
+
     public static final String LARA_ISSUER_RFC = "LABV570329UX6";
     public static final String LARA_FOLIO_PATTERN = "Folio:\\s*([A-Z0-9-]+)";
     public static final String LARA_TOTAL_PATTERN = "Total\\s*\\$\\s*([0-9,]+\\.\\d{2})";

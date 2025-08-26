@@ -5,13 +5,16 @@ import com.fundicion.lara.commons.data.ApiResponse;
 import com.fundicion.lara.commons.data.Pagination;
 import com.fundicion.lara.dto.ProductDto;
 import com.fundicion.lara.dto.request.RequestParams;
+import com.fundicion.lara.service.FileService;
 import com.fundicion.lara.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Tag(name = "PRODUCTS")
@@ -20,6 +23,7 @@ import java.util.List;
 @RequestMapping(value = "v1/management/products")
 public class ProductController {
     private ProductService productService;
+    private FileService fileService;
 
 
     @GetMapping
@@ -117,6 +121,21 @@ public class ProductController {
             @PathVariable Integer productId
     ) {
         return ApiResponse.ok(this.productService.deleteProductById(productId));
+    }
+
+    @PostMapping("/{productId}/upload")
+    @Operation(
+            operationId = "findProductById",
+            summary = "",
+            description = ""
+    )
+    public ApiResponse<String> uploadImageById(
+            @RequestParam("file") MultipartFile file,
+            @Parameter(name = "productId", description = "The unique identifier of the product")
+            @PathVariable Integer productId
+
+    ) throws IOException  {
+        return ApiResponse.ok(this.fileService.uploadImageById(file, productId));
     }
 
 }
