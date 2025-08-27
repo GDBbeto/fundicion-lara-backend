@@ -24,6 +24,7 @@ springdoc:
 
 logging:
   level:
+    root: INFO
     org:
       springframework: WARN
       hibernate:

@@ -13,6 +13,6 @@ import java.util.List;
 @SuperBuilder
 @NoArgsConstructor
 public class CommonErrorResponse implements Serializable {
-    private List<String> errors;
+    private String userMessage;
     private String message;
 }

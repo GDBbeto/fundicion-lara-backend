@@ -2,19 +2,20 @@ package com.fundicion.lara.exception;
 
 import lombok.Getter;
 
-import java.util.List;
-
 
 @Getter
 public class ConflictException extends RuntimeException{
-	private List<String> errors;
+
+	private String userMessage;
 
 	public ConflictException(String message) {
-		super(message);
+		super("");
+		this.userMessage = message;
 	}
 
-	public ConflictException(String message, List<String> errors) {
+	public ConflictException(String userMessage, String message) {
 		super(message);
-		this.errors = errors;
+		this.userMessage = userMessage;
 	}
+
 }

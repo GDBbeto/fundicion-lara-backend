@@ -21,7 +21,7 @@ public class ControllerHandler {
     @ResponseStatus(NOT_FOUND)
     public ResponseEntity<CommonErrorResponse> handleNotFoundException(NotFoundException ex) {
         CommonErrorResponse error = CommonErrorResponse.builder()
-                .errors(ex.getErrors())
+                .userMessage(ex.getUserMessage())
                 .message(ex.getMessage()).build();
         return new ResponseEntity<>(error, NOT_FOUND);
     }
@@ -30,7 +30,7 @@ public class ControllerHandler {
     @ResponseStatus(BAD_REQUEST)
     public ResponseEntity<CommonErrorResponse> handleBadRequestException(BadRequestException ex) {
         CommonErrorResponse error = CommonErrorResponse.builder()
-                .errors(ex.getErrors())
+                .userMessage(ex.getUserMessage())
                 .message(ex.getMessage()).build();
         return new ResponseEntity<>(error, BAD_REQUEST);
     }
@@ -39,7 +39,7 @@ public class ControllerHandler {
     @ResponseStatus(CONFLICT)
     public ResponseEntity<CommonErrorResponse> handleConflictException(ConflictException ex) {
         CommonErrorResponse error = CommonErrorResponse.builder()
-                .errors(ex.getErrors())
+                .userMessage(ex.getUserMessage())
                 .message(ex.getMessage()).build();
         return new ResponseEntity<>(error, CONFLICT);
     }
@@ -48,7 +48,7 @@ public class ControllerHandler {
     @ResponseStatus(INTERNAL_SERVER_ERROR)
     public ResponseEntity<CommonErrorResponse> handleIInternalException(InternalException ex) {
         CommonErrorResponse error = CommonErrorResponse.builder()
-                .errors(ex.getErrors())
+                .userMessage(ex.getUserMessage())
                 .message(ex.getMessage()).build();
         return new ResponseEntity<>(error, INTERNAL_SERVER_ERROR);
     }
@@ -57,7 +57,7 @@ public class ControllerHandler {
     @ResponseStatus(INTERNAL_SERVER_ERROR)
     public ResponseEntity<CommonErrorResponse> handleUnauthorizedException(UnauthorizedException ex) {
         CommonErrorResponse error = CommonErrorResponse.builder()
-                .errors(ex.getErrors())
+                .userMessage(ex.getUserMessage())
                 .message(ex.getMessage()).build();
         return new ResponseEntity<>(error, INTERNAL_SERVER_ERROR);
     }

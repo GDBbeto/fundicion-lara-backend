@@ -18,6 +18,6 @@ public enum TransactionType {
                 return transactionType;
             }
         }
-        throw new BadRequestException("No enum constant for type: " + type);
+        throw new BadRequestException("Lo sentimos, no se encontró una opción válida para el tipo: " + type);
     }
 }

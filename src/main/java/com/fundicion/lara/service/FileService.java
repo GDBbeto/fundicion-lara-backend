@@ -74,7 +74,8 @@ public class FileService {
             if (e instanceof BadRequestException) {
                 throw new InternalException(e.getMessage());
             }
-            throw new InternalException("Error al subir a Imgur: " + e.getMessage());
+            log.error("Error al procesar el archivo de imagen: {}", e.getMessage());
+            throw new InternalException("Hubo un problema al subir la imagen. Asegúrate de que el archivo sea válido y prueba nuevamente. ", e.getMessage());
         }
     }
 }

@@ -2,19 +2,20 @@ package com.fundicion.lara.exception;
 
 import lombok.Getter;
 
-import java.util.List;
-
 
 @Getter
 public class InternalException extends RuntimeException {
-	private List<String> errors;
+
+	private String userMessage;
 
 	public InternalException(String message) {
-		super(message);
+		super("");
+		this.userMessage = message;
 	}
 
-	public InternalException(String message, List<String> errors) {
+	public InternalException(String userMessage, String message) {
 		super(message);
-		this.errors = errors;
+		this.userMessage = userMessage;
 	}
+
 }

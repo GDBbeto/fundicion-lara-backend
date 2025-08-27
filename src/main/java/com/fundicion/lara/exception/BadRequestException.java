@@ -2,21 +2,20 @@ package com.fundicion.lara.exception;
 
 import lombok.Getter;
 
-import java.util.List;
-
 
 @Getter
 public class BadRequestException extends RuntimeException {
 
-	private List<String> errors;
+	private String userMessage;
 
 	public BadRequestException(String message) {
-		super(message);
+		super("");
+		this.userMessage = message;
 	}
 
-	public BadRequestException(String message, List<String> errors) {
+	public BadRequestException(String userMessage, String message) {
 		super(message);
-		this.errors = errors;
+		this.userMessage = userMessage;
 	}
 
 }

@@ -5,6 +5,7 @@ import com.fundicion.lara.dto.InvoicePatternConfig;
 import com.fundicion.lara.exception.BadRequestException;
 import com.fundicion.lara.exception.ConflictException;
 import com.fundicion.lara.exception.InternalException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import java.util.regex.Pattern;
 
 import static com.fundicion.lara.commons.constants.Constants.*;
 
+@Slf4j
 @Service
 public class InvoiceExtractorService {
     private final Map<String, InvoicePatternConfig> rfcPatterns = new HashMap<>();
@@ -62,12 +64,13 @@ public class InvoiceExtractorService {
                 return extractInvoiceData(text);
             }
         } catch (IOException e) {
-            throw new InternalException(ERROR_INVOICE_EXTRACT);
+            throw new InternalException(ERROR_INVOICE_EXTRACT, e.getMessage());
         } catch (Exception e) {
             if (e instanceof BadRequestException) {
                 throw new ConflictException(ERROR_INVOICE_EXTRACT);
             }
-            throw new InternalException(ERROR_INVOICE_EXTRACT);
+            log.error("error: {}", e.getMessage());
+            throw new InternalException(ERROR_INVOICE_EXTRACT, e.getMessage());
         }
     }
 
