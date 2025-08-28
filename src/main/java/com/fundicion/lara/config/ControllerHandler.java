@@ -1,6 +1,5 @@
 package com.fundicion.lara.config;
 
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fundicion.lara.commons.data.CommonErrorResponse;
 import com.fundicion.lara.exception.*;
 import org.springframework.http.HttpStatus;

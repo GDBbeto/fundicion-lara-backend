@@ -1,19 +1,23 @@
 package com.fundicion.lara.service;
 
+import com.fundicion.lara.commons.emuns.Status;
 import com.fundicion.lara.dto.ProductDto;
 import com.fundicion.lara.dto.request.RequestParams;
 import com.fundicion.lara.entity.ProductEntity;
-import com.fundicion.lara.exception.BadRequestException;
 import com.fundicion.lara.exception.ConflictException;
 import com.fundicion.lara.exception.NotFoundException;
+import com.fundicion.lara.repository.OrderTransactionRepository;
 import com.fundicion.lara.repository.ProductRepository;
+import com.fundicion.lara.utils.SpecificationUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,21 +28,33 @@ import java.util.stream.Collectors;
 public class ProductService {
     private ProductRepository productRepository;
     private ModelMapper modelMapper;
+    private OrderTransactionRepository orderTransactionRepository;
 
     public List<ProductDto> findAllProducts(RequestParams requestParams) {
-        var pagination = requestParams.getPagination();
-        var sort = Sort.by(Sort.Direction.fromString(requestParams.getOrder()), requestParams.getOrderBy());
-        var pageable = PageRequest.of(pagination.getNumberPage(), pagination.getPageSize(), sort);
+        List<ProductEntity> productEntities = getProductEntities(requestParams);
 
-        val response = this.productRepository.findAll(pageable);
-        if (response.isEmpty()) {
+        if (productEntities.isEmpty()) {
             throw new NotFoundException("Parece que no tenemos ningún producto en este momento.");
         }
-        pagination.setTotalElements(response.getTotalElements());
 
-        return response.getContent().stream()
+        return productEntities.stream()
                 .map(entity -> this.modelMapper.map(entity, ProductDto.class))
                 .collect(Collectors.toList());
+    }
+
+    private List<ProductEntity> getProductEntities(RequestParams requestParams) {
+        var pagination = requestParams.getPagination();
+        Specification<ProductEntity> specification = SpecificationUtil.getSpecificationByParams(requestParams, ProductEntity.class);
+
+        if (ObjectUtils.isEmpty(pagination.getPageSize()) && ObjectUtils.isEmpty(pagination.getPage())) {
+            return this.productRepository.findAll(specification);
+        }
+        var sort = Sort.by(Sort.Direction.fromString(requestParams.getOrder()), requestParams.getOrderBy());
+        var pageable = PageRequest.of(pagination.getNumberPage(), pagination.getPageSize(), sort);
+        var response = this.productRepository.findAll(specification, pageable);
+
+        pagination.setTotalElements(response.getTotalElements());
+        return response.getContent();
     }
 
     public ProductDto findProductById(Integer productId) {
@@ -51,6 +67,7 @@ public class ProductService {
             throw new ConflictException("El producto ya existe");
         }
         var productEntity = this.modelMapper.map(productDto, ProductEntity.class);
+        productEntity.setStatus(Status.ACTIVE.getValue());
         productEntity = this.productRepository.save(productEntity);
         return this.modelMapper.map(productEntity, ProductDto.class);
     }
@@ -68,8 +85,16 @@ public class ProductService {
     }
 
     public String deleteProductById(Integer productId) {
-        val product = findProductEntityById(productId);
-        this.productRepository.delete(product);
+        var product = findProductEntityById(productId);
+        var countByProduct = this.orderTransactionRepository.countByProduct(product);
+        log.info("Products encontrados: {}", countByProduct);
+        if (countByProduct > 0) {
+            product.setStatus(Status.INACTIVE.getValue());
+            this.productRepository.save(product);
+        } else {
+            this.productRepository.delete(product);
+        }
+
         return "OK";
     }
 

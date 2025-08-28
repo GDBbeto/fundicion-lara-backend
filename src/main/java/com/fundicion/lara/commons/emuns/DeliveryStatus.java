@@ -1,7 +1,5 @@
 package com.fundicion.lara.commons.emuns;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fundicion.lara.exception.BadRequestException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

@@ -27,5 +27,4 @@ public class Constants {
 
     // message
     public static final String ERROR_INVOICE_EXTRACT = "No pudimos extraer la información automáticamente. Por favor, ingresa los datos manualmente para avanzar.";
-
 }

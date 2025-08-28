@@ -41,4 +41,7 @@ public class ProductEntity extends AuditCommonEntity {
     @Column(name = "avatar")
     private String avatar;
 
+    @Column(name = "status")
+    private String status;
+
 }

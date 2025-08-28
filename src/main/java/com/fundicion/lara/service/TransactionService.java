@@ -1,5 +1,6 @@
 package com.fundicion.lara.service;
 
+import com.fundicion.lara.commons.emuns.Status;
 import com.fundicion.lara.commons.emuns.TransactionType;
 import com.fundicion.lara.dto.TransactionDto;
 import com.fundicion.lara.dto.TransactionSummaryDto;
@@ -95,7 +96,7 @@ public class TransactionService {
                 .description(orderTransactionEntity.getDescription())
                 .invoiceNumber(orderTransactionEntity.getInvoiceNumber())
                 .type(TransactionType.SALE)
-                .status("A")
+                .status(Status.ACTIVE.getValue())
                 .operationDate(orderTransactionEntity.getOperationDate())
                 .build();
 

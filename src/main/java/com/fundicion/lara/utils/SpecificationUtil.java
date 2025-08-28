@@ -1,6 +1,7 @@
 package com.fundicion.lara.utils;
 import com.fundicion.lara.commons.emuns.TransactionType;
 import com.fundicion.lara.dto.request.RequestParams;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -18,10 +19,15 @@ public class SpecificationUtil {
         return (Root<T> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             // Agregar predicados
-            predicates.add(criteriaBuilder.between(root.get("operationDate"), req.getStartDate(), req.getEndDate()));
+            if ( req.getStartDate() != null && req.getEndDate() != null) {
+                predicates.add(criteriaBuilder.between(root.get("operationDate"), req.getStartDate(), req.getEndDate()));
+            }
 
-            if (req.getType() != null) {
+            if (StringUtils.isNotBlank(req.getType())) {
                 predicates.add(root.get("type").in(toCommaListTransactionType(req.getType())));
+            }
+            if (StringUtils.isNotBlank(req.getStatus())) {
+                predicates.add(criteriaBuilder.equal(root.get("status"), req.getStatus()));
             }
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
@@ -29,12 +35,10 @@ public class SpecificationUtil {
     }
 
     private static List<TransactionType> toCommaListTransactionType(String str) {
-        // Divide el String por comas, recorta los espacios y convierte a lista de TransactionType
         List<TransactionType> transactionTypeList = Stream.of(str.split(","))
                 .map(String::trim)
-                .map(TransactionType::fromString) // Convertir a TransactionType
+                .map(TransactionType::fromString)
                 .collect(Collectors.toList());
-        // Si la lista está vacía, devuelve una lista con un valor por defecto (opcional)
         return transactionTypeList.isEmpty() ? Collections.singletonList(TransactionType.fromString(str)) : transactionTypeList;
     }
 }

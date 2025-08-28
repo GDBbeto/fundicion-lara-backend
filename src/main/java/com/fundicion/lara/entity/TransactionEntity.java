@@ -1,6 +1,7 @@
 package com.fundicion.lara.entity;
 
 
+import com.fundicion.lara.commons.emuns.Status;
 import com.fundicion.lara.commons.emuns.TransactionType;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -40,10 +41,10 @@ public class TransactionEntity extends AuditCommonEntity {
     private String issuerRfc;
 
     @Column(name = "type", nullable = false, length = 50)
-    private TransactionType type; // VENTA | COMPRA | GASTOS
+    private TransactionType type;
 
     @Column(name = "status")
-    private String status = "A"; // ACTIVO - INACTIVO
+    private String status = Status.ACTIVE.getValue();
 
     @Column(name = "operation_date", nullable = false)
     private LocalDate operationDate;

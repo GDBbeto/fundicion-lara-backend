@@ -3,6 +3,7 @@ package com.fundicion.lara.controller;
 
 import com.fundicion.lara.commons.data.ApiResponse;
 import com.fundicion.lara.commons.data.Pagination;
+import com.fundicion.lara.commons.emuns.Status;
 import com.fundicion.lara.dto.ProductDto;
 import com.fundicion.lara.dto.request.RequestParams;
 import com.fundicion.lara.service.FileService;
@@ -38,9 +39,9 @@ public class ProductController {
     )
     public ApiResponse<List<ProductDto>> findAllProducts(
             @Parameter(name = "page", description = "The page number to retrieve, starting from 1.")
-            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(required = false) Integer page,
             @Parameter(name = "pageSize", description = "The number of products to return per page.")
-            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(required = false) Integer pageSize,
             @Parameter(name = "order", description = "Sorting order: 'asc' for ascending or 'desc' for descending.")
             @RequestParam(defaultValue = "asc", required = false) String order,
             @Parameter(name = "orderBy", description = "The field by which to sort the products.")
@@ -54,6 +55,7 @@ public class ProductController {
         RequestParams requestParams = RequestParams.builder()
                 .order(order)
                 .orderBy(orderBy)
+                .status(Status.ACTIVE.getValue())
                 .pagination(pagination)
                 .build();
 
@@ -125,16 +127,16 @@ public class ProductController {
 
     @PostMapping("/{productId}/upload")
     @Operation(
-            operationId = "findProductById",
-            summary = "",
-            description = ""
+            operationId = "uploadImageById",
+            summary = "Upload an image for a specific product",
+            description = "This endpoint allows users to upload an image associated with a specific product identified by its unique product ID. The uploaded image will be processed and linked to the product."
     )
     public ApiResponse<String> uploadImageById(
             @RequestParam("file") MultipartFile file,
             @Parameter(name = "productId", description = "The unique identifier of the product")
             @PathVariable Integer productId
 
-    ) throws IOException  {
+    ) throws IOException {
         return ApiResponse.ok(this.fileService.uploadImageById(file, productId));
     }
 

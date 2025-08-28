@@ -1,6 +1,7 @@
 package com.fundicion.lara.dto;
 
 
+import com.fundicion.lara.commons.emuns.Status;
 import com.fundicion.lara.commons.emuns.TransactionType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,7 +32,7 @@ public class TransactionDto {
 
     private TransactionType type;
 
-    private String status = "A";
+    private String status = Status.ACTIVE.getValue();
 
     private LocalDate operationDate;
 }

@@ -6,7 +6,6 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
-import java.util.List;
 
 @Getter
 @Setter

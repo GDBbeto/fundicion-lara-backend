@@ -2,6 +2,7 @@ package com.fundicion.lara.service;
 
 import com.fundicion.lara.commons.emuns.DeliveryStatus;
 import com.fundicion.lara.commons.emuns.PaymentStatus;
+import com.fundicion.lara.commons.emuns.Status;
 import com.fundicion.lara.dto.OrderTransactionDto;
 import com.fundicion.lara.dto.request.RequestParams;
 import com.fundicion.lara.entity.OrderTransactionEntity;
@@ -93,7 +94,7 @@ public class OrderTransactionService {
 
         if (isStatusCancelled(orderTransactionDto, orderTransactionEntityCopy)) {
             orderTransactionEntity.setDeliveryStatus(orderTransactionDto.getDeliveryStatus());
-            this.transactionService.updateTransactionByOrderTransaction(orderTransactionEntity, "I");
+            this.transactionService.updateTransactionByOrderTransaction(orderTransactionEntity, Status.INACTIVE.getValue());
             this.transactionRepository.save(orderTransactionEntity);
             return this.mapEntityToDto(orderTransactionEntity);
         }
@@ -123,7 +124,7 @@ public class OrderTransactionService {
         orderTransactionEntity.setDeliveryStatus(orderTransactionDto.getDeliveryStatus());
         orderTransactionEntity.setOperationDate(orderTransactionDto.getOperationDate());
 
-        this.transactionService.updateTransactionByOrderTransaction(orderTransactionEntity, "A");
+        this.transactionService.updateTransactionByOrderTransaction(orderTransactionEntity, Status.ACTIVE.getValue());
 
         this.transactionRepository.save(orderTransactionEntity);
 

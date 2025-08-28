@@ -8,7 +8,6 @@ import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Setter
 @Getter
@@ -24,5 +23,4 @@ public class ProductDto implements Serializable {
     private BigDecimal purchasePrice;
     private BigDecimal sellingPrice;
     private String avatar;
-    private LocalDateTime createdAt;
 }
