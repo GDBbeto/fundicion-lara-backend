@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -22,4 +23,7 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
              @Param("startDate") LocalDate startDate,
              @Param("endDate") LocalDate endDate
      );
+
+     List<TransactionEntity> findAllByOperationDateBefore(LocalDate date);
+
 }
