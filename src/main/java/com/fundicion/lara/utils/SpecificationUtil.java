@@ -1,6 +1,7 @@
 package com.fundicion.lara.utils;
 import com.fundicion.lara.commons.emuns.TransactionType;
 import com.fundicion.lara.dto.request.RequestParams;
+import com.fundicion.lara.entity.ProductEntity;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -30,6 +31,16 @@ public class SpecificationUtil {
                 predicates.add(criteriaBuilder.equal(root.get("status"), req.getStatus()));
             }
 
+            if(StringUtils.isNotBlank((req.getSearch())) && ProductEntity.class.isAssignableFrom(entityClass)){
+                String search = req.getSearch().toLowerCase();
+                predicates.add(
+                        criteriaBuilder.like(
+                                criteriaBuilder.lower(root.get("name")),
+                                "%" + search + "%"
+                        )
+                );
+            }
+
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }
@@ -43,3 +54,27 @@ public class SpecificationUtil {
     }
 }
 
+/*
+
+String search = req.getSearch().toLowerCase(); // Lo normalizas a minúsculas
+
+// Construir el patrón LIKE
+String pattern = "%" + search + "%";
+
+// Predicate para 'name'
+Predicate namePredicate = criteriaBuilder.like(
+    criteriaBuilder.lower(root.get("name")),
+    pattern
+);
+
+// Predicate para 'client'
+Predicate clientPredicate = criteriaBuilder.like(
+    criteriaBuilder.lower(root.get("client")),
+    pattern
+);
+
+// Unir ambos con OR
+predicates.add(
+    criteriaBuilder.or(namePredicate, clientPredicate)
+);
+ */

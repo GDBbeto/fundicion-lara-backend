@@ -25,7 +25,8 @@ CREATE TABLE users
 CREATE TABLE products
 (
     product_id     integer PRIMARY KEY AUTO_INCREMENT,
-    name           varchar(100) UNIQUE NOT NULL,
+    name           varchar(100) NOT NULL,
+    client         varchar(100),
     description    varchar(200),
     unidad         varchar(10),
     stock          integer,
@@ -61,7 +62,7 @@ CREATE TABLE order_transactions
     item_count           integer        NOT NULL,
     method_payment       varchar(50),
     invoice_number       varchar(100),
-    client               varchar(100)   NOT NULL,
+    client               varchar(100),
     amount_paid          decimal(10, 2) NOT NULL,
     payment_status       varchar(10)    NOT NULL COMMENT 'PAGADO | PENDIENTE | NO PAGADO',
     delivery_status      varchar(10)    NOT NULL COMMENT 'PENDIENTE | EN TRANCITO | ENTREGADO | CANCELADO | EN ESPERA ',

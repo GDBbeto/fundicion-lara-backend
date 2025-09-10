@@ -2,6 +2,7 @@ package com.fundicion.lara.entity;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 
@@ -23,6 +24,9 @@ public class ProductEntity extends AuditCommonEntity {
     @Column(name = "name", nullable = false, unique = true, length = 100)
     private String name;
 
+    @Column(name = "client", length = 100)
+    private String client;
+
     @Column(name = "description", length = 200)
     private String description;
 
@@ -43,5 +47,10 @@ public class ProductEntity extends AuditCommonEntity {
 
     @Column(name = "status")
     private String status;
+
+    /* @Lob
+    @Type(type = "org.hibernate.type.ImageType")
+    @Column(name = "logo_blob")
+    private byte[] imageData; */
 
 }

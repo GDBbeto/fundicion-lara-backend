@@ -17,5 +17,6 @@ public class RequestParams {
     private LocalDate endDate;
     private String type;
     private String status;
+    private String search;
     private Pagination pagination;
 }

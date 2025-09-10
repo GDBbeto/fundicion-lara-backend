@@ -45,7 +45,9 @@ public class ProductController {
             @Parameter(name = "order", description = "Sorting order: 'asc' for ascending or 'desc' for descending.")
             @RequestParam(defaultValue = "asc", required = false) String order,
             @Parameter(name = "orderBy", description = "The field by which to sort the products.")
-            @RequestParam(defaultValue = "productId", required = false) String orderBy
+            @RequestParam(defaultValue = "productId", required = false) String orderBy,
+            @Parameter(name = "search", description = "search.")
+            @RequestParam( required = false) String search
     ) {
         Pagination pagination = Pagination.builder()
                 .page(page)
@@ -55,6 +57,7 @@ public class ProductController {
         RequestParams requestParams = RequestParams.builder()
                 .order(order)
                 .orderBy(orderBy)
+                .search(search)
                 .status(Status.ACTIVE.getValue())
                 .pagination(pagination)
                 .build();

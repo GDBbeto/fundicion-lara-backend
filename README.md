@@ -19,6 +19,8 @@
 
   ```bash
   ./gradlew bootRun
+  ./gradlew bootJar
+  java -jar build/libs/lara-0.0.1-SNAPSHOT.jar
 
 - Y puedes probar el endpoint accediendo a la siguiente URL:
   > `http://localhost:8080/swagger-ui/index.html#/`

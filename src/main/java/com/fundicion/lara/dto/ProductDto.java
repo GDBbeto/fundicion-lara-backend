@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 public class ProductDto implements Serializable {
     private Integer productId;
     private String name;
+    private String client;
     private String description;
     private String unidad;
     private Integer stock;

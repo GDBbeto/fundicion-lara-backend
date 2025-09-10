@@ -4,7 +4,6 @@ import com.fundicion.lara.commons.emuns.Status;
 import com.fundicion.lara.dto.ProductDto;
 import com.fundicion.lara.dto.request.RequestParams;
 import com.fundicion.lara.entity.ProductEntity;
-import com.fundicion.lara.exception.ConflictException;
 import com.fundicion.lara.exception.NotFoundException;
 import com.fundicion.lara.repository.OrderTransactionRepository;
 import com.fundicion.lara.repository.ProductRepository;
@@ -62,10 +61,6 @@ public class ProductService {
     }
 
     public ProductDto saveProduct(ProductDto productDto) {
-        var productByName = this.productRepository.findProductEntitiesByName(productDto.getName());
-        if (productByName.isPresent()) {
-            throw new ConflictException("El producto ya existe");
-        }
         var productEntity = this.modelMapper.map(productDto, ProductEntity.class);
         productEntity.setStatus(Status.ACTIVE.getValue());
         productEntity = this.productRepository.save(productEntity);
@@ -75,6 +70,7 @@ public class ProductService {
     public ProductDto updateProduct(ProductDto productDto, Integer productId) {
         var product = findProductEntityById(productId);
         product.setName(productDto.getName());
+        product.setClient(productDto.getClient());
         product.setDescription(productDto.getDescription());
         product.setUnidad(productDto.getUnidad());
         product.setStock(productDto.getStock());
