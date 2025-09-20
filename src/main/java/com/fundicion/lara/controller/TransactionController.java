@@ -49,7 +49,9 @@ public class TransactionController {
             @RequestParam(value = "endDate")
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @Parameter(name = "type", description = "The type of transactions to filter by: SALE, PURCHASE, or EXPENSE.")
-            @RequestParam(required = false) String type
+            @RequestParam(required = false) String type,
+            @Parameter(name = "search", description = "search.")
+            @RequestParam( required = false) String search
     ) {
         Pagination pagination = Pagination.builder()
                 .page(page)
@@ -62,6 +64,7 @@ public class TransactionController {
                 .startDate(startDate)
                 .endDate(endDate)
                 .type(type)
+                .search(search)
                 .pagination(pagination)
                 .build();
 

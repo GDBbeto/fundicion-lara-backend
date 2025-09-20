@@ -17,5 +17,6 @@ import java.math.BigDecimal;
 public class TransactionSummaryDto implements Serializable {
     private BigDecimal totalSales;
     private BigDecimal totalPurchases;
+    private BigDecimal totalExpenses;
     private BigDecimal difference;
 }

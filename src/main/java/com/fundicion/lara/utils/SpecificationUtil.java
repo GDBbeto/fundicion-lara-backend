@@ -1,7 +1,9 @@
 package com.fundicion.lara.utils;
+
 import com.fundicion.lara.commons.emuns.TransactionType;
 import com.fundicion.lara.dto.request.RequestParams;
 import com.fundicion.lara.entity.ProductEntity;
+import com.fundicion.lara.entity.TransactionEntity;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -20,7 +22,7 @@ public class SpecificationUtil {
         return (Root<T> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             // Agregar predicados
-            if ( req.getStartDate() != null && req.getEndDate() != null) {
+            if (req.getStartDate() != null && req.getEndDate() != null) {
                 predicates.add(criteriaBuilder.between(root.get("operationDate"), req.getStartDate(), req.getEndDate()));
             }
 
@@ -31,14 +33,33 @@ public class SpecificationUtil {
                 predicates.add(criteriaBuilder.equal(root.get("status"), req.getStatus()));
             }
 
-            if(StringUtils.isNotBlank((req.getSearch())) && ProductEntity.class.isAssignableFrom(entityClass)){
-                String search = req.getSearch().toLowerCase();
-                predicates.add(
-                        criteriaBuilder.like(
-                                criteriaBuilder.lower(root.get("name")),
-                                "%" + search + "%"
-                        )
-                );
+            if (StringUtils.isNotBlank((req.getSearch()))) {
+                if (ProductEntity.class.isAssignableFrom(entityClass)) {
+                    String search = req.getSearch().toLowerCase();
+                    predicates.add(
+                            criteriaBuilder.like(
+                                    criteriaBuilder.lower(root.get("name")),
+                                    "%" + search + "%"
+                            )
+                    );
+                } else if (TransactionEntity.class.isAssignableFrom(entityClass)) {
+                    String search = req.getSearch().toLowerCase(); // Lo normalizas a minúsculas
+                    String pattern = "%" + search + "%";
+
+                    Predicate namePredicate = criteriaBuilder.like(
+                            criteriaBuilder.lower(root.get("invoiceNumber")),
+                            pattern
+                    );
+
+                    Predicate clientPredicate = criteriaBuilder.like(
+                            criteriaBuilder.lower(root.get("issuerRfc")),
+                            pattern
+                    );
+
+                    predicates.add(
+                            criteriaBuilder.or(namePredicate, clientPredicate)
+                    );
+                }
             }
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

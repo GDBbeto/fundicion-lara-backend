@@ -52,35 +52,26 @@ public class TransactionService {
     }
 
     public TransactionSummaryDto findTransactionSummary(RequestParams requestParams) {
-        var totalSales = this.transactionRepository.getTotalByTypeAndDateRange(
-                TransactionType.SALE,
-                requestParams.getStartDate(),
-                requestParams.getEndDate()
-        );
-
-        var totalPurchases = this.transactionRepository.getTotalByTypeAndDateRange(
-                TransactionType.PURCHASE,
-                requestParams.getStartDate(),
-                requestParams.getEndDate()
-        );
-
-        if (totalSales == null) {
-            totalSales = BigDecimal.ZERO;
-        }
-        if (totalPurchases == null) {
-            totalPurchases = BigDecimal.ZERO;
-        }
+        BigDecimal totalSales = getSafeTotal(TransactionType.SALE, requestParams);
+        BigDecimal totalPurchases = getSafeTotal(TransactionType.PURCHASE, requestParams);
+        BigDecimal totalExpenses = getSafeTotal(TransactionType.EXPENSE, requestParams);
 
         return TransactionSummaryDto.builder()
                 .totalSales(totalSales)
                 .totalPurchases(totalPurchases)
+                .totalExpenses(totalExpenses)
                 .difference(totalSales.subtract(totalPurchases))
                 .build();
+    }
 
+    private BigDecimal getSafeTotal(TransactionType type, RequestParams requestParams) {
+        BigDecimal total = transactionRepository.getTotalByTypeAndDateRange(type, requestParams.getStartDate(), requestParams.getEndDate());
+        return total != null ? total : BigDecimal.ZERO;
     }
 
     public TransactionDto saveTransaction(TransactionDto transactionDto) {
         var transactionEntity = modelMapper.map(transactionDto, TransactionEntity.class);
+        transactionEntity.setStatus(Status.ACTIVE.getValue());
         transactionEntity = transactionRepository.save(transactionEntity);
         return this.modelMapper.map(transactionEntity, TransactionDto.class);
     }
