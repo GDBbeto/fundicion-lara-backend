@@ -3,6 +3,7 @@ package com.fundicion.lara.controller;
 import com.fundicion.lara.commons.data.ApiResponse;
 import com.fundicion.lara.commons.data.Pagination;
 import com.fundicion.lara.dto.OrderTransactionDto;
+import com.fundicion.lara.dto.request.OrderTransactionRequest;
 import com.fundicion.lara.dto.request.RequestParams;
 import com.fundicion.lara.service.OrderTransactionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -88,7 +89,7 @@ public class OrderTransactionController {
                     "the complete saved transaction with generated identifiers (transactionId). "
     )
     public ApiResponse<OrderTransactionDto> savePaymentTransaction(
-            @RequestBody OrderTransactionDto orderTransactionDto
+            @RequestBody OrderTransactionRequest orderTransactionDto
     ) {
         return ApiResponse.ok(this.orderTransactionService.savePaymentTransaction(orderTransactionDto));
     }
@@ -101,7 +102,7 @@ public class OrderTransactionController {
                     "The system will validate the transaction data before saving and return "
     )
     public ApiResponse<OrderTransactionDto> updatePaymentTransaction(
-            @RequestBody OrderTransactionDto orderTransactionDto,
+            @RequestBody OrderTransactionRequest orderTransactionDto,
             @Parameter(name = "orderTransactionId", description = "The unique identifier of the payment transaction")
             @PathVariable Integer orderTransactionId
     ) {

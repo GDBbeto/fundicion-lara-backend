@@ -76,7 +76,7 @@ public class InvoiceExtractorService {
 
     private InvoiceDataDto extractInvoiceData(String text) {
         String normalizedText = text.replaceAll("\\s+", " ");
-        System.out.println(normalizedText);
+        log.debug(normalizedText);
         var rfc = extractIssuerRfcPattern(normalizedText);
         InvoicePatternConfig config = rfcPatterns.get(rfc);
         if (config == null) {

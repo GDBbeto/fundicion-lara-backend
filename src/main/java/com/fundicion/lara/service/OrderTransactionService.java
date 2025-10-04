@@ -4,6 +4,7 @@ import com.fundicion.lara.commons.emuns.DeliveryStatus;
 import com.fundicion.lara.commons.emuns.PaymentStatus;
 import com.fundicion.lara.commons.emuns.Status;
 import com.fundicion.lara.dto.OrderTransactionDto;
+import com.fundicion.lara.dto.request.OrderTransactionRequest;
 import com.fundicion.lara.dto.request.RequestParams;
 import com.fundicion.lara.entity.OrderTransactionEntity;
 import com.fundicion.lara.entity.ProductEntity;
@@ -43,6 +44,7 @@ public class OrderTransactionService {
 
         val response = this.transactionRepository.findAll(specification, pageable);
         if (response.isEmpty()) {
+            log.info("No transactions found {}", requestParams);
             throw new NotFoundException("No se encontraron registros que coincidan.");
         }
 
@@ -59,8 +61,8 @@ public class OrderTransactionService {
     }
 
     @Transactional
-    public OrderTransactionDto savePaymentTransaction(OrderTransactionDto orderTransactionDto) {
-        var orderTransactionEntity = this.mapDtoToEntity(orderTransactionDto);
+    public OrderTransactionDto savePaymentTransaction(OrderTransactionRequest orderTransactionDto) {
+        var orderTransactionEntity = this.mapRequestDtoToEntity(orderTransactionDto);
 
         val product = orderTransactionEntity.getProduct();
 
@@ -88,7 +90,7 @@ public class OrderTransactionService {
     }
 
     @Transactional
-    public OrderTransactionDto updatePaymentTransaction(OrderTransactionDto orderTransactionDto, Integer orderTransactionId) {
+    public OrderTransactionDto updatePaymentTransaction(OrderTransactionRequest orderTransactionDto, Integer orderTransactionId) {
         var orderTransactionEntity = this.findPaymentTransactionEntityEntityById(orderTransactionId);
         var orderTransactionEntityCopy = modelMapper.map(orderTransactionEntity, OrderTransactionEntity.class);
 
@@ -149,7 +151,7 @@ public class OrderTransactionService {
         return "OK";
     }
 
-    private boolean isStatusCancelled(OrderTransactionDto orderTransactionDto, OrderTransactionEntity orderTransactionEntity) {
+    private boolean isStatusCancelled(OrderTransactionRequest orderTransactionDto, OrderTransactionEntity orderTransactionEntity) {
         if (DeliveryStatus.CANCELLED.getStatus().equals(orderTransactionDto.getDeliveryStatus().getStatus())) {
             val currentProduct = orderTransactionEntity.getProduct();
             updateStock(currentProduct, orderTransactionEntity.getItemCount(), true);
@@ -159,7 +161,7 @@ public class OrderTransactionService {
     }
 
 
-    private void validateProduct(OrderTransactionDto orderTransactionDto, OrderTransactionEntity orderTransactionEntity) {
+    private void validateProduct(OrderTransactionRequest orderTransactionDto, OrderTransactionEntity orderTransactionEntity) {
         boolean productChanged = !orderTransactionDto.getProductId().equals(orderTransactionEntity.getProduct().getProductId());
         boolean itemCountChanged = !orderTransactionEntity.getItemCount().equals(orderTransactionDto.getItemCount());
 
@@ -178,7 +180,7 @@ public class OrderTransactionService {
         }
     }
 
-    private void handleProductChange(OrderTransactionDto orderTransactionDto, OrderTransactionEntity orderTransactionEntity, ProductEntity currentProduct, ProductEntity newProduct) {
+    private void handleProductChange(OrderTransactionRequest orderTransactionDto, OrderTransactionEntity orderTransactionEntity, ProductEntity currentProduct, ProductEntity newProduct) {
         log.debug("Hay cambios en producto");
 
         if (orderTransactionDto.getItemCount() > newProduct.getStock()) {
@@ -192,7 +194,7 @@ public class OrderTransactionService {
         updateStock(newProduct, orderTransactionDto.getItemCount(), false);
     }
 
-    private void handleItemCountChange(OrderTransactionDto orderTransactionDto, OrderTransactionEntity orderTransactionEntity, ProductEntity currentProduct) {
+    private void handleItemCountChange(OrderTransactionRequest orderTransactionDto, OrderTransactionEntity orderTransactionEntity, ProductEntity currentProduct) {
         log.debug("Solo cambio en Items");
         int currentItemCount = orderTransactionEntity.getItemCount();
         int newItemCount = orderTransactionDto.getItemCount();
@@ -248,7 +250,7 @@ public class OrderTransactionService {
         return this.modelMapper.map(orderTransactionEntity, OrderTransactionDto.class);
     }
 
-    public OrderTransactionEntity mapDtoToEntity(OrderTransactionDto orderTransactionDto) {
+    public OrderTransactionEntity mapRequestDtoToEntity(OrderTransactionRequest orderTransactionDto) {
         OrderTransactionEntity entity = modelMapper.map(orderTransactionDto, OrderTransactionEntity.class);
         ProductEntity product = productService.findProductEntityById(orderTransactionDto.getProductId());
         entity.setProduct(product);

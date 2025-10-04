@@ -1,4 +1,4 @@
-package com.fundicion.lara.dto;
+package com.fundicion.lara.dto.request;
 
 import com.fundicion.lara.commons.emuns.DeliveryStatus;
 import com.fundicion.lara.commons.emuns.MethodPayment;
@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -17,13 +18,11 @@ import java.time.LocalDate;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderTransactionDto implements Serializable {
+public class OrderTransactionRequest implements Serializable {
     private Integer orderTransactionId;
     private BigDecimal extraAmount;
     private String description;
     private Integer productId;
-    private String productName;
-    private String productImageUrl;
     private Integer itemCount;
     private MethodPayment methodPayment;
     private String invoiceNumber;
@@ -31,15 +30,6 @@ public class OrderTransactionDto implements Serializable {
     private BigDecimal amountPaid;
     private PaymentStatus paymentStatus;
     private DeliveryStatus deliveryStatus;
-    private BigDecimal purchasePrice;
-    private BigDecimal sellingPrice;
-    private BigDecimal profit;
     private LocalDate operationDate;
     private Boolean addTransaction;
-
-    public BigDecimal getProfit() {
-        BigDecimal totalPurchase =purchasePrice.multiply(BigDecimal.valueOf(itemCount));
-        BigDecimal totalSelling = sellingPrice.multiply(BigDecimal.valueOf(itemCount));
-        return totalSelling.subtract(totalPurchase);
-    }
 }

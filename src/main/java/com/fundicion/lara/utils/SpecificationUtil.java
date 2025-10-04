@@ -2,6 +2,7 @@ package com.fundicion.lara.utils;
 
 import com.fundicion.lara.commons.emuns.TransactionType;
 import com.fundicion.lara.dto.request.RequestParams;
+import com.fundicion.lara.entity.OrderTransactionEntity;
 import com.fundicion.lara.entity.ProductEntity;
 import com.fundicion.lara.entity.TransactionEntity;
 import org.apache.commons.lang3.StringUtils;
@@ -34,18 +35,23 @@ public class SpecificationUtil {
             }
 
             if (StringUtils.isNotBlank((req.getSearch()))) {
+                // Lo normalizas a minúsculas
+                String search = req.getSearch().toLowerCase();
+                String pattern = "%" + search + "%";
                 if (ProductEntity.class.isAssignableFrom(entityClass)) {
-                    String search = req.getSearch().toLowerCase();
-                    predicates.add(
-                            criteriaBuilder.like(
-                                    criteriaBuilder.lower(root.get("name")),
-                                    "%" + search + "%"
-                            )
+                    Predicate namePredicate = criteriaBuilder.like(
+                            criteriaBuilder.lower(root.get("name")),
+                            pattern
                     );
-                } else if (TransactionEntity.class.isAssignableFrom(entityClass)) {
-                    String search = req.getSearch().toLowerCase(); // Lo normalizas a minúsculas
-                    String pattern = "%" + search + "%";
+                    Predicate clientPredicate = criteriaBuilder.like(
+                            criteriaBuilder.lower(root.get("client")),
+                            pattern
+                    );
+                    predicates.add(
+                            criteriaBuilder.or(namePredicate, clientPredicate)
+                    );
 
+                } else if (TransactionEntity.class.isAssignableFrom(entityClass)) {
                     Predicate namePredicate = criteriaBuilder.like(
                             criteriaBuilder.lower(root.get("invoiceNumber")),
                             pattern
@@ -53,6 +59,20 @@ public class SpecificationUtil {
 
                     Predicate clientPredicate = criteriaBuilder.like(
                             criteriaBuilder.lower(root.get("issuerRfc")),
+                            pattern
+                    );
+
+                    predicates.add(
+                            criteriaBuilder.or(namePredicate, clientPredicate)
+                    );
+                } else if (OrderTransactionEntity.class.isAssignableFrom(entityClass)) {
+                    Predicate namePredicate = criteriaBuilder.like(
+                            criteriaBuilder.lower(root.get("description")),
+                            pattern
+                    );
+
+                    Predicate clientPredicate = criteriaBuilder.like(
+                            criteriaBuilder.lower(root.get("client")),
                             pattern
                     );
 
@@ -75,27 +95,3 @@ public class SpecificationUtil {
     }
 }
 
-/*
-
-String search = req.getSearch().toLowerCase(); // Lo normalizas a minúsculas
-
-// Construir el patrón LIKE
-String pattern = "%" + search + "%";
-
-// Predicate para 'name'
-Predicate namePredicate = criteriaBuilder.like(
-    criteriaBuilder.lower(root.get("name")),
-    pattern
-);
-
-// Predicate para 'client'
-Predicate clientPredicate = criteriaBuilder.like(
-    criteriaBuilder.lower(root.get("client")),
-    pattern
-);
-
-// Unir ambos con OR
-predicates.add(
-    criteriaBuilder.or(namePredicate, clientPredicate)
-);
- */
