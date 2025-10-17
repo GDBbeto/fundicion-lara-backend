@@ -31,5 +31,5 @@ public class OrderTransactionRequest implements Serializable {
     private PaymentStatus paymentStatus;
     private DeliveryStatus deliveryStatus;
     private LocalDate operationDate;
-    private Boolean addTransaction;
+    private Boolean registerInSales;
 }

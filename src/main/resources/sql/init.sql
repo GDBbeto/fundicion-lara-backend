@@ -12,15 +12,35 @@ USE fundicion_lara_db;
 CREATE TABLE users
 (
     user_id     integer PRIMARY KEY AUTO_INCREMENT,
-    username    varchar(255) UNIQUE NOT NULL,
+    name        varchar(50) NOT NULL,
+    last_name   varchar(50) NOT NULL COMMENT 'Apellido paterno',
+    mother_last_name varchar(50) NOT NULL COMMENT 'Apellido materno',
     email       varchar(255) UNIQUE NOT NULL,
     password    varchar(255)        NOT NULL,
-    full_name   varchar(255)        NOT NULL COMMENT 'ADMIN | CONSULTA',
-    role        varchar(255)        NOT NULL,
-    gender      varchar(10)         NOT NULL,
+    role        varchar(50)        NOT NULL COMMENT 'ADMIN | CONSULTA',
     update_Date datetime            NOT NULL,
     created_at  datetime            NOT NULL
 );
+
+INSERT INTO users (
+    name,
+    last_name,
+    mother_last_name,
+    email,
+    password,
+    role,
+    update_date,
+    created_at
+) VALUES (
+             'Roberto',
+             'Aguilar',
+             'Vazquez',
+             'roberto.aav.23@gmail.com',
+             'admin',
+             'ADMIN',
+             NOW(),
+             NOW()
+         );
 
 CREATE TABLE products
 (
@@ -68,7 +88,8 @@ CREATE TABLE order_transactions
     delivery_status      varchar(10)    NOT NULL COMMENT 'PENDIENTE | EN TRANCITO | ENTREGADO | CANCELADO | EN ESPERA ',
     selling_price        decimal(10, 2) COMMENT 'Precio venta',
     purchase_price       decimal(10, 2) NOT NULL COMMENT 'Precio compra',
-    operation_date       date           NOT NULL,
+    register_in_sales BOOLEAN NULL COMMENT 'Indica si también se registra en ventas',
+    operation_date       date           NULL,
     update_Date          datetime       NOT NULL,
     created_at           datetime       NOT NULL
 );

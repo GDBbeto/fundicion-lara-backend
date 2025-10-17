@@ -5,6 +5,7 @@ import com.fundicion.lara.dto.request.RequestParams;
 import com.fundicion.lara.entity.OrderTransactionEntity;
 import com.fundicion.lara.entity.ProductEntity;
 import com.fundicion.lara.entity.TransactionEntity;
+import com.fundicion.lara.entity.UserEntity;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -73,6 +74,20 @@ public class SpecificationUtil {
 
                     Predicate clientPredicate = criteriaBuilder.like(
                             criteriaBuilder.lower(root.get("client")),
+                            pattern
+                    );
+
+                    predicates.add(
+                            criteriaBuilder.or(namePredicate, clientPredicate)
+                    );
+                } else if (UserEntity.class.isAssignableFrom(entityClass)) {
+                    Predicate namePredicate = criteriaBuilder.like(
+                            criteriaBuilder.lower(root.get("name")),
+                            pattern
+                    );
+
+                    Predicate clientPredicate = criteriaBuilder.like(
+                            criteriaBuilder.lower(root.get("email")),
                             pattern
                     );
 

@@ -70,11 +70,13 @@ public class OrderTransactionService {
             throw new ConflictException("Las unidades excede el stock disponible del producto.");
         }
 
-        product.setStock(product.getStock() - orderTransactionEntity.getItemCount());
-        this.productRepository.save(product);
+        if (isStatusCompleted(orderTransactionDto)) {
+            product.setStock(product.getStock() - orderTransactionEntity.getItemCount());
+            this.productRepository.save(product);
+        }
 
-        BigDecimal total = product.getSellingPrice().multiply(BigDecimal.valueOf(orderTransactionDto.getItemCount()));
-        this.processPayment(orderTransactionEntity, total);
+        // BigDecimal total = product.getSellingPrice().multiply(BigDecimal.valueOf(orderTransactionDto.getItemCount()));
+        // this.processPayment(orderTransactionEntity, total);
         orderTransactionEntity.setSellingPrice(product.getSellingPrice());
         orderTransactionEntity.setPurchasePrice(product.getPurchasePrice());
         if (orderTransactionDto.getDeliveryStatus() == null) {
@@ -83,7 +85,7 @@ public class OrderTransactionService {
 
         orderTransactionEntity = this.transactionRepository.save(orderTransactionEntity);
 
-        if (orderTransactionDto.getAddTransaction()) {
+        if (orderTransactionDto.getRegisterInSales()) {
             this.transactionService.saveTransactionByOrderTransaction(orderTransactionEntity);
         }
         return this.mapEntityToDto(orderTransactionEntity);
@@ -100,14 +102,14 @@ public class OrderTransactionService {
             this.transactionRepository.save(orderTransactionEntity);
             return this.mapEntityToDto(orderTransactionEntity);
         }
+        if (isStatusCompleted(orderTransactionDto)) {
+            validateProduct(orderTransactionDto, orderTransactionEntityCopy);
+            boolean productChanged = !orderTransactionDto.getProductId().equals(orderTransactionEntity.getProduct().getProductId());
 
-        validateProduct(orderTransactionDto, orderTransactionEntityCopy);
-
-        boolean productChanged = !orderTransactionDto.getProductId().equals(orderTransactionEntity.getProduct().getProductId());
-
-        if (productChanged) {
-            orderTransactionEntity.setSellingPrice(orderTransactionEntity.getProduct().getSellingPrice());
-            orderTransactionEntity.setPurchasePrice(orderTransactionEntity.getProduct().getPurchasePrice());
+            if (productChanged) {
+                orderTransactionEntity.setSellingPrice(orderTransactionEntity.getProduct().getSellingPrice());
+                orderTransactionEntity.setPurchasePrice(orderTransactionEntity.getProduct().getPurchasePrice());
+            }
         }
 
         // var product = productService.findProductEntityById(orderTransactionDto.getProductId());
@@ -119,14 +121,17 @@ public class OrderTransactionService {
         orderTransactionEntity.setInvoiceNumber(String.valueOf(orderTransactionDto.getInvoiceNumber()));
         orderTransactionEntity.setClient(String.valueOf(orderTransactionDto.getClient()));
         orderTransactionEntity.setAmountPaid(orderTransactionDto.getAmountPaid());
+        orderTransactionEntity.setRegisterInSales(orderTransactionDto.getRegisterInSales());
 
-        BigDecimal total = orderTransactionEntity.getSellingPrice().multiply(BigDecimal.valueOf(orderTransactionEntity.getItemCount()));
-        this.processPayment(orderTransactionEntity, total);
+        // BigDecimal total = orderTransactionEntity.getSellingPrice().multiply(BigDecimal.valueOf(orderTransactionEntity.getItemCount()));
+        // this.processPayment(orderTransactionEntity, total);
 
         orderTransactionEntity.setDeliveryStatus(orderTransactionDto.getDeliveryStatus());
         orderTransactionEntity.setOperationDate(orderTransactionDto.getOperationDate());
 
-        this.transactionService.updateTransactionByOrderTransaction(orderTransactionEntity, Status.ACTIVE.getValue());
+        if (orderTransactionDto.getRegisterInSales()) {
+            this.transactionService.updateTransactionByOrderTransaction(orderTransactionEntity, Status.ACTIVE.getValue());
+        }
 
         this.transactionRepository.save(orderTransactionEntity);
 
@@ -137,10 +142,13 @@ public class OrderTransactionService {
     @Transactional
     public String deleteTransactionById(Integer id) {
         val paymentTransaction = this.findPaymentTransactionEntityEntityById(id);
-        val statusCompleted = DeliveryStatus.CANCELLED.getStatus().equals(paymentTransaction.getDeliveryStatus().getStatus()) ||
-                DeliveryStatus.DELIVERED.getStatus().equals(paymentTransaction.getDeliveryStatus().getStatus());
 
-        if (!statusCompleted) {
+        var paymentTransactionRequest = OrderTransactionRequest.builder()
+                .paymentStatus(paymentTransaction.getPaymentStatus())
+                .deliveryStatus(paymentTransaction.getDeliveryStatus())
+                .build();
+
+        if (isStatusCompleted(paymentTransactionRequest)) {
             val currentProduct = paymentTransaction.getProduct();
             updateStock(currentProduct, paymentTransaction.getItemCount(), true);
         }
@@ -158,6 +166,11 @@ public class OrderTransactionService {
             return true;
         }
         return false;
+    }
+
+    private boolean isStatusCompleted(OrderTransactionRequest paymentTransaction) {
+        return PaymentStatus.PAID.getStatus().equals(paymentTransaction.getPaymentStatus().getStatus()) &&
+                DeliveryStatus.DELIVERED.getStatus().equals(paymentTransaction.getDeliveryStatus().getStatus());
     }
 
 

@@ -2,7 +2,6 @@ package com.fundicion.lara.entity;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 

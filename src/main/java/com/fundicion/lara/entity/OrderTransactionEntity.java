@@ -70,4 +70,7 @@ public class OrderTransactionEntity extends AuditCommonEntity {
     @Column(name = "operation_date", nullable = false)
     private LocalDate operationDate;
 
+    @Column(name = "register_in_sales", nullable = true)
+    private Boolean registerInSales;
+
 }

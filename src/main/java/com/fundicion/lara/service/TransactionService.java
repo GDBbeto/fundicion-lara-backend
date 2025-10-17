@@ -119,7 +119,9 @@ public class TransactionService {
             transactionEntity.setOperationDate(orderTransactionEntity.getOperationDate());
             transactionEntity.setStatus(status);
             this.transactionRepository.save(transactionEntity);
+            return;
         }
+        saveTransactionByOrderTransaction(orderTransactionEntity);
     }
 
     public String deleteTransactionById(Long id) {
