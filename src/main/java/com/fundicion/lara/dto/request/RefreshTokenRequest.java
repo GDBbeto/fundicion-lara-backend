@@ -1,6 +1,5 @@
-package com.fundicion.lara.dto.response;
+package com.fundicion.lara.dto.request;
 
-import com.fundicion.lara.dto.UserDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,11 +13,6 @@ import java.io.Serializable;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-
-public class AuthResponse implements Serializable {
-    private String accessToken;
+public class RefreshTokenRequest implements Serializable {
     private String refreshToken;
-    private String tokenType;
-    private long expiresIn;
-    private UserDto user;
 }
