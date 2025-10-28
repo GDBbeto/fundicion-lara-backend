@@ -1,8 +1,9 @@
 package com.fundicion.lara.controller;
 
 import com.fundicion.lara.commons.data.ApiResponse;
+import com.fundicion.lara.commons.emuns.TransactionType;
 import com.fundicion.lara.dto.InvoiceDataDto;
-import com.fundicion.lara.service.InvoiceExtractorService;
+import com.fundicion.lara.service.InvoiceExtractorV2Service;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
@@ -17,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 @RequestMapping(value = "v1/management/invoices")
 public class InvoiceExtractorController {
-    private InvoiceExtractorService invoiceExtractorService;
+    private InvoiceExtractorV2Service invoiceExtractorV2Service;
 
     @PostMapping("/extract")
     @Operation(
@@ -31,7 +32,12 @@ public class InvoiceExtractorController {
                     "The extraction uses pattern recognition to identify key fields in the invoice text."
 
     )
-    public ApiResponse<InvoiceDataDto> getExtractInvoiceData(@RequestParam("file") MultipartFile file) {
-        return ApiResponse.ok(this.invoiceExtractorService.findExtractInvoiceData(file));
+    public ApiResponse<InvoiceDataDto> extractV2(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("transactionType") String transactionTypeStr) {
+        TransactionType transactionType = TransactionType.fromString(transactionTypeStr);
+
+        return ApiResponse.ok(invoiceExtractorV2Service.extractInvoiceData(file, transactionType));
     }
+
 }

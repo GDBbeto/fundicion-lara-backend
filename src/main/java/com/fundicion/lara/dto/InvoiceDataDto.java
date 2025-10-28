@@ -8,6 +8,7 @@ import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Map;
 
 @Setter
 @Getter
@@ -18,4 +19,6 @@ public class InvoiceDataDto implements Serializable {
     private String invoiceNumber;
     private BigDecimal amount;
     private String issuerRfc;
+
+    private Map<String, Object> pdfInfoFallback;
 }

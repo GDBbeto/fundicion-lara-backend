@@ -36,6 +36,11 @@ dependencies {
 
 	implementation 'org.apache.pdfbox:pdfbox:2.0.29'
 
+	// Apache Tika: detección del tipo de archivo y extracción de texto más precisa
+	implementation 'org.apache.tika:tika-core:2.9.2'
+	implementation 'org.apache.tika:tika-parsers-standard-package:2.9.2'
+
+
 	runtimeOnly("mysql:mysql-connector-java")
 	implementation 'com.fasterxml.jackson.core:jackson-databind'
 

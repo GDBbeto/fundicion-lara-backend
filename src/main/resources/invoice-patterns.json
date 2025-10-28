@@ -1,0 +1,32 @@
+{
+  "LABV570329UX6": {
+    "folioPattern": "Folio:\\s*([A-Z0-9-]+)",
+    "totalPattern": "Total\\s*\\$\\s*([0-9,]+\\.\\d{2})",
+    "groupTotal": 1
+  },
+  "LAME900208TC9": {
+    "folioPattern": "Folio:\\s*([A-Z0-9-]+)",
+    "totalPattern": "Total\\s*\\$\\s*([0-9,]+\\.\\d{2})",
+    "groupTotal": 1
+  },
+  "AUMJ9811073H3": {
+    "folioPattern": "Folio fiscal:\\s*([A-Z0-9-]+)",
+    "totalPattern": "Total\\s*\\$\\s*([0-9,]+\\.\\d{2})",
+    "groupTotal": 1
+  },
+  "GGA030723741": {
+    "folioPattern": "FOLIO:\\s*CH\\s*([0-9]+)",
+    "totalPattern": "TOTAL:\\s*\\$\\s*([0-9,]+\\.\\d{2})\\s*\\$\\s*([0-9,]+\\.\\d{2})",
+    "groupTotal": 2
+  },
+  "SAGO660417PR5": {
+    "folioPattern": "Factura\\s*(\\d+)",
+    "totalPattern": " TOTAL\\s*\\$\\s*([0-9,]+\\.\\d{2})",
+    "groupTotal": 1
+  },
+  "LIN080130NU9": {
+    "folioPattern": "Folio fiscal:\\s*([A-Z0-9-]+)",
+    "totalPattern": "Total\\s*\\$\\s*([0-9,]+\\.\\d{2})",
+    "groupTotal": 1
+  }
+}
