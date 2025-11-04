@@ -6,6 +6,7 @@ import com.fundicion.lara.commons.emuns.TransactionType;
 import com.fundicion.lara.dto.InvoiceDataDto;
 import com.fundicion.lara.dto.InvoicePatternConfig;
 import com.fundicion.lara.exception.BadRequestException;
+import com.fundicion.lara.exception.ConflictException;
 import com.fundicion.lara.exception.InternalException;
 import com.fundicion.lara.utils.RegexPatterns;
 import lombok.extern.slf4j.Slf4j;
@@ -78,6 +79,9 @@ public class InvoiceExtractorV2Service {
                 Map<String, Object> pdfInfoFallback = null;
                 if (folio == null && total == null) {
                     pdfInfoFallback = buildPdfInfoFallback(normalizedText);
+                    if(pdfInfoFallback == null) {
+                        throw new ConflictException(ERROR_INVOICE_EXTRACT);
+                    }
                 }
 
                 return InvoiceDataDto.builder()

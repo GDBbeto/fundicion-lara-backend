@@ -46,7 +46,9 @@ public class OrderTransactionController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @Parameter(name = "endDate", description = "The end date for filtering transactions (inclusive). Format: YYYY-MM-DD")
             @RequestParam(value = "endDate")
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @Parameter(name = "search", description = "search.")
+            @RequestParam( required = false) String search
     ) {
         Pagination pagination = Pagination.builder()
                 .page(page)
@@ -59,6 +61,7 @@ public class OrderTransactionController {
                 .startDate(startDate)
                 .endDate(endDate)
                 .pagination(pagination)
+                .search(search)
                 .build();
 
         return ApiResponse.ok(this.orderTransactionService.findAllPaymentTransactions(requestParams), pagination);

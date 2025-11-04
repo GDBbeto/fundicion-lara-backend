@@ -77,8 +77,14 @@ public class SpecificationUtil {
                             pattern
                     );
 
+                    var productJoin = root.join("product");
+                    Predicate productNamePredicate = criteriaBuilder.like(
+                            criteriaBuilder.lower(productJoin.get("name")),
+                            pattern
+                    );
+
                     predicates.add(
-                            criteriaBuilder.or(namePredicate, clientPredicate)
+                            criteriaBuilder.or(namePredicate, clientPredicate, productNamePredicate)
                     );
                 } else if (UserEntity.class.isAssignableFrom(entityClass)) {
                     Predicate namePredicate = criteriaBuilder.like(

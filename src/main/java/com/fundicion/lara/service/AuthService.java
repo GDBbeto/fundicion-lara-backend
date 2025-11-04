@@ -17,9 +17,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-
-
-
 @Service
 @AllArgsConstructor
 public class AuthService {
@@ -34,22 +31,22 @@ public class AuthService {
         String key = request.getEmail();
 
         if (!rateLimiter.isAllowed(key)) {
-            throw new RuntimeException("Too many failed attempts. Try again later.");
+            throw new RuntimeException("Demasiados intentos fallidos. Intenta nuevamente más tarde.");
         }
 
         var userEntity = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new NotFoundException("Invalid email or password"));
+                .orElseThrow(() -> new NotFoundException("Correo electrónico o contraseña incorrectos."));
 
         if (!passwordEncoder.matches(request.getPassword(), userEntity.getPassword())) {
             rateLimiter.recordFailedAttempt(key);
-            throw new NotFoundException("Invalid email or password");
+            throw new NotFoundException("Correo electrónico o contraseña incorrectos.");
         }
 
         rateLimiter.reset(key);
 
         String accessToken = jwtUtil.generateAccessToken(userEntity.getEmail());
         String refreshToken = jwtUtil.generateRefreshToken(userEntity.getEmail());
-        long expiresIn = jwtUtil.getAccessTokenExpiration(); // ms
+        long expiresIn = jwtUtil.getAccessTokenExpiration(); // milisegundos
 
         UserDto userDto = modelMapper.map(userEntity, UserDto.class);
 
@@ -65,16 +62,15 @@ public class AuthService {
     public AuthResponse refreshToken(RefreshTokenRequest request) {
         var refresh = request.getRefreshToken();
         if (!jwtUtil.validateToken(refresh)) {
-            throw new RuntimeException("Refresh token invalid or expired");
+            throw new RuntimeException("El token de actualización no es válido o ha expirado.");
         }
 
         String subject = jwtUtil.extractUsername(refresh);
         String newAccess = jwtUtil.generateAccessToken(subject);
         long expiresIn = jwtUtil.getAccessTokenExpiration();
 
-        // Optionally you can fetch user details
         var userEntity = userRepository.findByEmail(subject)
-                .orElseThrow(() -> new NotFoundException("User not found"));
+                .orElseThrow(() -> new NotFoundException("No se encontró el usuario."));
 
         return AuthResponse.builder()
                 .accessToken(newAccess)
@@ -87,7 +83,7 @@ public class AuthService {
 
     public UserDto register(UserRequest userRequest) {
         if (userRepository.existsByEmail(userRequest.getEmail())) {
-            throw new RuntimeException("El correo ya está registrado.");
+            throw new RuntimeException("El correo electrónico ya se encuentra registrado.");
         }
 
         val encodedPassword = passwordEncoder.encode(userRequest.getPassword());

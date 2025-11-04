@@ -36,7 +36,7 @@ INSERT INTO users (
              'Aguilar',
              'Vazquez',
              'roberto.aav.23@gmail.com',
-             'admin',
+             '$2a$10$cndpB8I6KxxCrNlcmp.PcOgjQwLjHdZKPrbrEnp8OK331ub1KwK52',
              'ADMIN',
              NOW(),
              NOW()

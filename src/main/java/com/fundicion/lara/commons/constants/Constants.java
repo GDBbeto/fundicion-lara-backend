@@ -10,5 +10,8 @@ public class Constants {
     public static final int TWO_YEARS_AGO = 2;
     public static final String  BATCH_CRON_EXPRESSION = "0 0 7 * * ?";
 
+    public static final String ERROR_INVOICE_EXTRACT = "No pudimos extraer la información automáticamente. Por favor, ingresa los datos manualmente para avanzar.";
+
+
 
 }
