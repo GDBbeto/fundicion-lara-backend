@@ -52,4 +52,14 @@ public class AuthController {
     public ApiResponse<UserDto> register(@RequestBody UserRequest userRequest) {
         return ApiResponse.ok(authService.register(userRequest));
     }
+
+    @PostMapping("/status")
+    @Operation(
+            operationId = "status",
+            summary = "status",
+            description = "status"
+    )
+    public ApiResponse<String> status() {
+        return ApiResponse.ok("OK");
+    }
 }
