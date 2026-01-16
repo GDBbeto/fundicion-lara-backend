@@ -1,9 +1,0 @@
-[build]
-builder = "RAILPACK"
-buildCommand = "./gradlew clean build -x test"
-
-[build.env]
-JAVA_VERSION = "17"
-
-[deploy]
-startCommand = "java -jar -Dserver.port=$PORT $(ls -1 build/libs/*jar | grep -v plain)"
