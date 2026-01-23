@@ -8,10 +8,8 @@ import com.fundicion.lara.dto.request.OrderTransactionRequest;
 import com.fundicion.lara.dto.request.RequestParams;
 import com.fundicion.lara.entity.OrderTransactionEntity;
 import com.fundicion.lara.entity.ProductEntity;
-import com.fundicion.lara.exception.ConflictException;
 import com.fundicion.lara.exception.NotFoundException;
 import com.fundicion.lara.repository.OrderTransactionRepository;
-import com.fundicion.lara.repository.ProductRepository;
 import com.fundicion.lara.utils.SpecificationUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +29,6 @@ import java.util.List;
 public class OrderTransactionService {
     private OrderTransactionRepository transactionRepository;
     private ProductService productService;
-    private ProductRepository productRepository;
     private ModelMapper modelMapper;
     private TransactionService transactionService;
 
@@ -66,17 +63,6 @@ public class OrderTransactionService {
 
         val product = orderTransactionEntity.getProduct();
 
-        if (orderTransactionEntity.getItemCount() > product.getStock()) {
-            throw new ConflictException("Las unidades excede el stock disponible del producto.");
-        }
-
-        if (isStatusCompleted(orderTransactionDto)) {
-            product.setStock(product.getStock() - orderTransactionEntity.getItemCount());
-            this.productRepository.save(product);
-        }
-
-        // BigDecimal total = product.getSellingPrice().multiply(BigDecimal.valueOf(orderTransactionDto.getItemCount()));
-        // this.processPayment(orderTransactionEntity, total);
         orderTransactionEntity.setSellingPrice(product.getSellingPrice());
         orderTransactionEntity.setPurchasePrice(product.getPurchasePrice());
         if (orderTransactionDto.getDeliveryStatus() == null) {
@@ -94,16 +80,14 @@ public class OrderTransactionService {
     @Transactional
     public OrderTransactionDto updatePaymentTransaction(OrderTransactionRequest orderTransactionDto, Integer orderTransactionId) {
         var orderTransactionEntity = this.findPaymentTransactionEntityEntityById(orderTransactionId);
-        var orderTransactionEntityCopy = modelMapper.map(orderTransactionEntity, OrderTransactionEntity.class);
 
-        if (isStatusCancelled(orderTransactionDto, orderTransactionEntityCopy)) {
+        if (isStatusCancelled(orderTransactionDto)) {
             orderTransactionEntity.setDeliveryStatus(orderTransactionDto.getDeliveryStatus());
             this.transactionService.updateTransactionByOrderTransaction(orderTransactionEntity, Status.INACTIVE.getValue());
             this.transactionRepository.save(orderTransactionEntity);
             return this.mapEntityToDto(orderTransactionEntity);
         }
         if (isStatusCompleted(orderTransactionDto)) {
-            validateProduct(orderTransactionDto, orderTransactionEntityCopy);
             boolean productChanged = !orderTransactionDto.getProductId().equals(orderTransactionEntity.getProduct().getProductId());
 
             if (productChanged) {
@@ -112,7 +96,6 @@ public class OrderTransactionService {
             }
         }
 
-        // var product = productService.findProductEntityById(orderTransactionDto.getProductId());
         orderTransactionEntity.setProduct(orderTransactionEntity.getProduct());
         orderTransactionEntity.setItemCount(orderTransactionDto.getItemCount());
         orderTransactionEntity.setExtraAmount(orderTransactionDto.getExtraAmount());
@@ -143,99 +126,20 @@ public class OrderTransactionService {
     public String deleteTransactionById(Integer id) {
         val paymentTransaction = this.findPaymentTransactionEntityEntityById(id);
 
-        var paymentTransactionRequest = OrderTransactionRequest.builder()
-                .paymentStatus(paymentTransaction.getPaymentStatus())
-                .deliveryStatus(paymentTransaction.getDeliveryStatus())
-                .build();
-
-        if (isStatusCompleted(paymentTransactionRequest)) {
-            val currentProduct = paymentTransaction.getProduct();
-            updateStock(currentProduct, paymentTransaction.getItemCount(), true);
-        }
-
         this.transactionService.deleteTransactionByByOrderTransactionId(id);
 
         this.transactionRepository.delete(paymentTransaction);
         return "OK";
     }
 
-    private boolean isStatusCancelled(OrderTransactionRequest orderTransactionDto, OrderTransactionEntity orderTransactionEntity) {
-        if (DeliveryStatus.CANCELLED.getStatus().equals(orderTransactionDto.getDeliveryStatus().getStatus())) {
-            val currentProduct = orderTransactionEntity.getProduct();
-            updateStock(currentProduct, orderTransactionEntity.getItemCount(), true);
-            return true;
-        }
-        return false;
+    private boolean isStatusCancelled(OrderTransactionRequest orderTransactionDto) {
+        return DeliveryStatus.CANCELLED.getStatus().equals(orderTransactionDto.getDeliveryStatus().getStatus());
     }
 
     private boolean isStatusCompleted(OrderTransactionRequest paymentTransaction) {
         return PaymentStatus.PAID.getStatus().equals(paymentTransaction.getPaymentStatus().getStatus()) &&
                 DeliveryStatus.DELIVERED.getStatus().equals(paymentTransaction.getDeliveryStatus().getStatus());
     }
-
-
-    private void validateProduct(OrderTransactionRequest orderTransactionDto, OrderTransactionEntity orderTransactionEntity) {
-        boolean productChanged = !orderTransactionDto.getProductId().equals(orderTransactionEntity.getProduct().getProductId());
-        boolean itemCountChanged = !orderTransactionEntity.getItemCount().equals(orderTransactionDto.getItemCount());
-
-        if (!productChanged && !itemCountChanged) {
-            log.debug("No hay cambios");
-            return;
-        }
-
-        val currentProduct = orderTransactionEntity.getProduct();
-        val newProduct = this.productService.findProductEntityById(orderTransactionDto.getProductId());
-
-        if (productChanged) {
-            handleProductChange(orderTransactionDto, orderTransactionEntity, currentProduct, newProduct);
-        } else {
-            handleItemCountChange(orderTransactionDto, orderTransactionEntity, currentProduct);
-        }
-    }
-
-    private void handleProductChange(OrderTransactionRequest orderTransactionDto, OrderTransactionEntity orderTransactionEntity, ProductEntity currentProduct, ProductEntity newProduct) {
-        log.debug("Hay cambios en producto");
-
-        if (orderTransactionDto.getItemCount() > newProduct.getStock()) {
-            log.debug("El itemCount excede el stock disponible del nuevo producto.");
-            throw new ConflictException("Las unidades excede el stock disponible del nuevo producto.");
-        }
-
-        int previousItemCount = orderTransactionEntity.getItemCount();
-        updateStock(currentProduct, previousItemCount, true);
-
-        updateStock(newProduct, orderTransactionDto.getItemCount(), false);
-    }
-
-    private void handleItemCountChange(OrderTransactionRequest orderTransactionDto, OrderTransactionEntity orderTransactionEntity, ProductEntity currentProduct) {
-        log.debug("Solo cambio en Items");
-        int currentItemCount = orderTransactionEntity.getItemCount();
-        int newItemCount = orderTransactionDto.getItemCount();
-
-        if (newItemCount < currentItemCount) {
-            log.debug("Si itemCount es menor al actual");
-            updateStock(currentProduct, currentItemCount - newItemCount, true);
-        } else {
-            log.debug("Si itemCount es mayor al actual");
-            int difference = newItemCount - currentItemCount;
-            if (difference > currentProduct.getStock()) {
-                log.debug("El nuevo itemCount excede el stock disponible del producto.");
-                throw new ConflictException("El nuevo valor de las unidades excede el stock disponible del producto.");
-            }
-            updateStock(currentProduct, difference, false);
-        }
-    }
-
-
-    private void updateStock(ProductEntity product, int amount, boolean isAddition) {
-        if (isAddition) {
-            product.setStock(product.getStock() + amount);
-        } else {
-            product.setStock(product.getStock() - amount);
-        }
-        this.productRepository.save(product);
-    }
-
 
     private OrderTransactionEntity findPaymentTransactionEntityEntityById(Integer id) {
         val productEntity = this.transactionRepository.findById(id);

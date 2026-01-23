@@ -11,7 +11,7 @@ import java.util.Date;
 public class JwtUtil {
 
     private static final String SECRET = "MY_SUPER_SECRET_KEY_FOR_JWT_256_BIT_LONG_ENOUGH_123456";
-    private static final long ACCESS_TOKEN_EXPIRATION = 1000 * 60 * 15; // 15 min in ms
+    private static final long ACCESS_TOKEN_EXPIRATION = 1000 * 60 * 60; // 15 min in ms
     private static final long REFRESH_TOKEN_EXPIRATION = 1000 * 60 * 60 * 24; // 24h in ms
 
     private final Key key = Keys.hmacShaKeyFor(SECRET.getBytes());
