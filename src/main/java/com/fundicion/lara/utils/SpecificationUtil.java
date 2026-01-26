@@ -35,6 +35,11 @@ public class SpecificationUtil {
                 predicates.add(criteriaBuilder.equal(root.get("status"), req.getStatus()));
             }
 
+            if ( ProductEntity.class.isAssignableFrom(entityClass) && StringUtils.isNotBlank(req.getClient())){
+                predicates.add(criteriaBuilder.equal(criteriaBuilder.lower(root.get("client")),req.getClient().toLowerCase()));
+            }
+
+
             if (StringUtils.isNotBlank((req.getSearch()))) {
                 // Lo normalizas a minúsculas
                 String search = req.getSearch().toLowerCase();
@@ -46,13 +51,6 @@ public class SpecificationUtil {
                     );
 
                     if (StringUtils.isNotBlank(req.getClient())) {
-                        predicates.add(
-                                criteriaBuilder.equal(
-                                        criteriaBuilder.lower(root.get("client")),
-                                        req.getClient().toLowerCase()
-                                )
-                        );
-
                         predicates.add(
                                 criteriaBuilder.or(namePredicate)
                         );
