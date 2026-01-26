@@ -103,5 +103,9 @@ public class ProductService {
         }
         return productEntity.get();
     }
+
+    public List<String> getUniqueClients() {
+        return productRepository.findDistinctClientsUpperCase();
+    }
 }
 

@@ -44,13 +44,27 @@ public class SpecificationUtil {
                             criteriaBuilder.lower(root.get("name")),
                             pattern
                     );
-                    Predicate clientPredicate = criteriaBuilder.like(
-                            criteriaBuilder.lower(root.get("client")),
-                            pattern
-                    );
-                    predicates.add(
-                            criteriaBuilder.or(namePredicate, clientPredicate)
-                    );
+
+                    if (StringUtils.isNotBlank(req.getClient())) {
+                        predicates.add(
+                                criteriaBuilder.equal(
+                                        criteriaBuilder.lower(root.get("client")),
+                                        req.getClient().toLowerCase()
+                                )
+                        );
+
+                        predicates.add(
+                                criteriaBuilder.or(namePredicate)
+                        );
+                    } else {
+                        Predicate clientPredicate = criteriaBuilder.like(
+                                criteriaBuilder.lower(root.get("client")),
+                                pattern
+                        );
+                        predicates.add(
+                                criteriaBuilder.or(namePredicate, clientPredicate)
+                        );
+                    }
 
                 } else if (TransactionEntity.class.isAssignableFrom(entityClass)) {
                     Predicate namePredicate = criteriaBuilder.like(

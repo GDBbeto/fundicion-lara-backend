@@ -18,5 +18,6 @@ public class RequestParams {
     private String type;
     private String status;
     private String search;
+    private String client;
     private Pagination pagination;
 }

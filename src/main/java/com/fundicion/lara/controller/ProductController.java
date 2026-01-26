@@ -47,7 +47,9 @@ public class ProductController {
             @Parameter(name = "orderBy", description = "The field by which to sort the products.")
             @RequestParam(defaultValue = "productId", required = false) String orderBy,
             @Parameter(name = "search", description = "search.")
-            @RequestParam( required = false) String search
+            @RequestParam( required = false) String search,
+            @Parameter(name = "client", description = "client.")
+            @RequestParam( required = false) String client
     ) {
         Pagination pagination = Pagination.builder()
                 .page(page)
@@ -58,6 +60,7 @@ public class ProductController {
                 .order(order)
                 .orderBy(orderBy)
                 .search(search)
+                .client(client)
                 .status(Status.ACTIVE.getValue())
                 .pagination(pagination)
                 .build();
@@ -143,4 +146,15 @@ public class ProductController {
         return ApiResponse.ok(this.fileService.uploadImageById(file, productId));
     }
 
+
+    @GetMapping("/clients")
+    @Operation(
+            operationId = "getUniqueClients",
+            summary = "Retrieve unique clients in uppercase",
+            description = "This endpoint retrieves a list of unique client names associated with products. " +
+                    "The comparison is case-insensitive and the response is returned in uppercase format."
+    )
+    public ApiResponse<List<String>> getUniqueClients() {
+        return ApiResponse.ok(productService.getUniqueClients());
+    }
 }
