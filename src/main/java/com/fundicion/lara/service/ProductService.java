@@ -45,7 +45,7 @@ public class ProductService {
         var pagination = requestParams.getPagination();
         Specification<ProductEntity> specification = SpecificationUtil.getSpecificationByParams(requestParams, ProductEntity.class);
 
-        if (ObjectUtils.isEmpty(pagination.getPageSize()) && ObjectUtils.isEmpty(pagination.getPage())) {
+        if (pagination == null || (ObjectUtils.isEmpty(pagination.getPageSize()) && ObjectUtils.isEmpty(pagination.getPage()))) {
             return this.productRepository.findAll(specification);
         }
         var sort = Sort.by(Sort.Direction.fromString(requestParams.getOrder()), requestParams.getOrderBy());

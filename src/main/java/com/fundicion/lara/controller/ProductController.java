@@ -7,13 +7,17 @@ import com.fundicion.lara.commons.emuns.Status;
 import com.fundicion.lara.dto.ProductDto;
 import com.fundicion.lara.dto.request.RequestParams;
 import com.fundicion.lara.service.FileService;
+import com.fundicion.lara.service.ProductExcelService;
 import com.fundicion.lara.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.HttpHeaders;
 
 import java.io.IOException;
 import java.util.List;
@@ -25,6 +29,7 @@ import java.util.List;
 public class ProductController {
     private ProductService productService;
     private FileService fileService;
+    private ProductExcelService excelService;
 
 
     @GetMapping
@@ -156,5 +161,50 @@ public class ProductController {
     )
     public ApiResponse<List<String>> getUniqueClients() {
         return ApiResponse.ok(productService.getUniqueClients());
+    }
+
+    @GetMapping("/download")
+    @Operation(
+            operationId = "downloadProducts",
+            summary = "Download products list as an Excel file",
+            description = "This endpoint allows downloading the list of products as an Excel (.xlsx) file. " +
+                    "The exported file respects the same filters available in the product listing endpoint, " +
+                    "including search criteria, client filtering, and sorting options. " +
+                    "Pagination is disabled for this operation, and all matching products will be included in the file. " +
+                    "This endpoint is intended for reporting and offline usage."
+    )
+    public ResponseEntity<byte[]> downloadProducts(
+            @Parameter(name = "order", description = "Sorting order: 'asc' for ascending or 'desc' for descending.")
+            @RequestParam(defaultValue = "asc", required = false) String order,
+            @Parameter(name = "orderBy", description = "The field by which to sort the products.")
+            @RequestParam(defaultValue = "productId", required = false) String orderBy,
+            @Parameter(name = "search", description = "search.")
+            @RequestParam( required = false) String search,
+            @Parameter(name = "client", description = "client.")
+            @RequestParam( required = false) String client
+    ) {
+
+
+        RequestParams requestParams = RequestParams.builder()
+                .order(order)
+                .orderBy(orderBy)
+                .search(search)
+                .client(client)
+                .status(Status.ACTIVE.getValue())
+                .build();
+
+        byte[] excel = excelService.generateExcel(productService.findAllProducts(requestParams));
+
+        String timestamp = java.time.LocalDateTime.now()
+                .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
+
+        String filename = "productos_fundicion_" + timestamp + ".xlsx";
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=" + filename)
+                .header("file_name", filename )
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(excel);
     }
 }
