@@ -29,7 +29,7 @@ public class WebMvcConfig  implements WebMvcConfigurer {
                 .allowedOrigins("*") // ← Corrección aquí
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
-                .exposedHeaders("Content-Disposition", "file_name")
+                .exposedHeaders("Content-Disposition", "File-Name")
                 .allowCredentials(false);
     }
 

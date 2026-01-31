@@ -203,7 +203,7 @@ public class ProductController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION,
                         "attachment; filename=" + filename)
-                .header("file_name", filename )
+                .header("File-Name", filename )
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(excel);
     }
