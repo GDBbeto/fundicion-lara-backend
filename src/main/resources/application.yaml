@@ -8,7 +8,7 @@ spring:
     username: "${SPRING_DATASOURCE_USERNAME:root}"
     password: "${SPRING_DATASOURCE_PASSWORD:root}"
     hikari:
-      maximum-pool-size: "${MAXIMUM_POOL_SIZE:10}"
+      maximum-pool-size: "${MAXIMUM_POOL_SIZE:5}"
   servlet:
     multipart:
       max-file-size: 10MB
@@ -38,4 +38,4 @@ logging:
         SQL: ERROR
 
 image:
-  api-key: "${IMAGE_API_KEY:daee93372ab89b87258a5c42dbf63342}"
+  api-key: "${IMAGE_API_KEY}"
